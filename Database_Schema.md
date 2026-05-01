@@ -1,0 +1,124 @@
+# Blueprint Arsitektur Database EcoTrash
+
+Dokumen ini memuat rancangan skema basis data (*Database Schema*) untuk proyek EcoTrash, didasarkan pada dokumen kebutuhan (PRD) dan spesifikasi antarmuka Warga, Admin, serta Petugas.
+
+---
+
+## 1. Entity Relationship Diagram (ERD)
+
+Berikut adalah visualisasi relasi antar entitas utama menggunakan sintaks Mermaid.
+
+```mermaid
+erDiagram
+    USERS ||--o{ ALAMAT_WARGA : memiliki
+    USERS ||--o{ PESANAN : "membuat (warga)"
+    USERS ||--o{ PESANAN : "menangani (petugas)"
+    USERS ||--o{ LAPORAN : "melaporkan (warga)"
+    USERS ||--o{ LAPORAN : "menyelesaikan (petugas)"
+    USERS }o--o{ ARTIKEL : "bookmark (warga)"
+    
+    KOMPLEK ||--o{ ALAMAT_WARGA : "terletak di"
+    KOMPLEK ||--o{ PESANAN : "lokasi pesanan"
+    KOMPLEK ||--o{ USERS : "area tugas (petugas)"
+
+    ALAMAT_WARGA }|..|| USERS : "user_id"
+    PESANAN }|..|| USERS : "warga_id / petugas_id"
+```
+
+---
+
+## 2. Spesifikasi Tabel dan Kolom
+
+### 1. `users` (Tabel Induk Autentikasi Warga, Petugas, Admin)
+Menyimpan semua akun pengguna dengan pemisahan akses menggunakan kolom `role`.
+- `id` (Primary Key, BigInt)
+- `nama` (String)
+- `email` (String, Unique)
+- `password` (String, Hashed)
+- `role` (Enum: 'admin', 'warga', 'petugas')
+- `saldo_koin` (Integer, Default: 0) -> *Hanya untuk warga*
+- `status_kehadiran` (Enum: 'aktif', 'berhalangan') -> *Hanya untuk petugas*
+- `alasan_berhalangan` (Text, Nullable) -> *Diisi jika petugas mengajukan status berhalangan*
+- `created_at`, `updated_at` (Timestamp)
+
+### 1a. `petugas_komplek` (Tabel Pivot Area Tugas)
+Menyimpan relasi multi-area penugasan untuk role Petugas (1 Petugas bisa handle banyak komplek).
+- `petugas_id` (Foreign Key -> `users.id`)
+- `komplek_id` (Foreign Key -> `komplek.id`)
+- `created_at` (Timestamp)
+
+### 2. `komplek` (Master Data Komplek)
+- `id` (Primary Key, BigInt)
+- `nama_komplek` (String)
+- `lat` (Decimal) -> *Koordinat Peta*
+- `lng` (Decimal) -> *Koordinat Peta*
+- `created_at`, `updated_at` (Timestamp)
+
+### 3. `alamat_warga`
+Satu warga bisa memiliki lebih dari satu alamat tersimpan.
+- `id` (Primary Key, BigInt)
+- `warga_id` (Foreign Key -> `users.id`)
+- `komplek_id` (Foreign Key -> `komplek.id`)
+- `blok_nomor_rumah` (String)
+- `is_utama` (Boolean, Default: false)
+- `created_at`, `updated_at` (Timestamp)
+
+### 4. `pengaturan_sistem`
+Tabel *single-row* atau *key-value* untuk menyimpan konfigurasi dari Admin.
+- `id` (Primary Key, BigInt)
+- `konversi_koin_rupiah` (Integer) -> *Berapa Rp untuk 1 koin*
+- `harga_kategori_kecil` (Integer)
+- `harga_kategori_sedang` (Integer)
+- `harga_kategori_besar` (Integer)
+- `batas_waktu_pesan` (Time) -> *Cut-off time pesanan harian*
+- `kuota_pesanan_harian` (Integer)
+- `hari_operasional` (JSON) -> *Contoh: ["Senin", "Selasa", "Kamis"]*
+- `created_at`, `updated_at` (Timestamp)
+
+### 5. `pesanan_pengangkutan`
+Tabel transaksi utama untuk layanan angkut sampah.
+- `id` (Primary Key, UUID/String) -> *Bisa diformat sebagai resi, misal: INV-1234*
+- `warga_id` (Foreign Key -> `users.id`)
+- `komplek_id` (Foreign Key -> `komplek.id`)
+- `blok_nomor_rumah` (String) -> *Snapshotted saat pesan, berjaga-jaga jika alamat warga dihapus*
+- `kategori_sampah` (Enum: 'kecil', 'sedang', 'besar')
+- `tanggal_penjemputan` (Date)
+- `nama_hari_penjemputan` (String)
+- `catatan_warga` (Text, Nullable)
+- `koin_digunakan` (Integer, Default: 0)
+- `total_harga_akhir` (Integer)
+- `status` (Enum: 'menunggu_pembayaran', 'menunggu', 'diproses', 'selesai', 'dibatalkan', 'hold_kapasitas', 'gagal_pickup')
+- `status_pembayaran` (Enum: 'unpaid', 'paid', 'failed')
+- `metode_pembayaran` (Enum: 'qris', 'transfer_bank')
+- `petugas_id` (Foreign Key -> `users.id`, Nullable) -> *Di-assign oleh admin setelah paid*
+- `ukuran_aktual_laporan_petugas` (Enum: 'sedang', 'besar', Nullable) -> *Terisi jika ada kasus beda ukuran*
+- `foto_bukti_selesai` (String/URL, Nullable)
+- `created_at`, `updated_at` (Timestamp)
+
+### 6. `laporan_sampah_liar`
+Tabel untuk penanganan sampah ilegal.
+- `id` (Primary Key, BigInt)
+- `warga_id` (Foreign Key -> `users.id`)
+- `lat` (Decimal)
+- `lng` (Decimal)
+- `deskripsi` (Text)
+- `foto_laporan_warga` (String/URL)
+- `status` (Enum: 'menunggu', 'disetujui', 'ditolak', 'sedang_dibersihkan', 'selesai')
+- `koin_reward` (Integer, Default: 0) -> *Koin yang diberikan admin jika disetujui*
+- `petugas_id` (Foreign Key -> `users.id`, Nullable) -> *Petugas yang menangani*
+- `foto_bukti_selesai_petugas` (String/URL, Nullable)
+- `created_at`, `updated_at` (Timestamp)
+
+### 7. `artikel_edukasi`
+- `id` (Primary Key, BigInt)
+- `judul` (String)
+- `kategori` (String)
+- `gambar_thumbnail` (String/URL)
+- `konten_html` (LongText)
+- `penulis_admin_id` (Foreign Key -> `users.id`)
+- `created_at`, `updated_at` (Timestamp)
+
+### 8. `bookmark_artikel` (Tabel Pivot)
+- `warga_id` (Foreign Key -> `users.id`)
+- `artikel_id` (Foreign Key -> `artikel_edukasi.id`)
+- `created_at` (Timestamp)
