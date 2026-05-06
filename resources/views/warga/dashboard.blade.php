@@ -51,11 +51,40 @@
 @endsection
 
 @section('content')
-<div class="p-4 md:p-0 space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-8" x-data="{ hasActiveOrder: true, showHistory: false, showTrackingModal: false }">
+<div class="p-4 md:p-0 space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-8" x-data="{ hasActiveOrder: true, hasSelisihOrder: true, hasGagalPickupOrder: true, showHistory: false, showTrackingModal: false, showSelisihModal: false, isPayingSelisih: false, paySelisih() { this.isPayingSelisih = true; setTimeout(() => { this.isPayingSelisih = false; this.showSelisihModal = false; this.hasSelisihOrder = false; showToast('Pembayaran berhasil. Jadwal diundur ke hari kerja berikutnya.', 'success'); }, 2000); } }">
 
     <!-- Left Column (Desktop) -->
     <div class="md:col-span-8 space-y-6 md:space-y-8">
         
+        <!-- Banner Notifikasi: Gagal Pickup (Pagar Tertutup) -->
+        <template x-if="hasGagalPickupOrder">
+            <div class="bg-red-50 border border-red-200 rounded-3xl p-5 flex items-start gap-4">
+                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+                    <span class="material-symbols-outlined">door_front</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-red-800 text-sm md:text-base">Gagal Pickup: Pagar Tertutup</h3>
+                    <p class="text-xs md:text-sm text-red-700 mt-1">Petugas tidak dapat mengambil sampah Anda karena pagar tertutup. Jadwal pengangkutan Anda dialihkan ke hari kerja berikutnya.</p>
+                    <button @click="hasGagalPickupOrder = false" class="mt-3 text-xs font-bold text-red-600 bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg transition-colors">Tutup Notifikasi</button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Banner Notifikasi: Selisih Pembayaran -->
+        <template x-if="hasSelisihOrder">
+            <div class="bg-amber-50 border border-amber-200 rounded-3xl p-5 flex items-start gap-4">
+                <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-amber-900 text-sm md:text-base">Pembayaran Tambahan Diperlukan</h3>
+                    <p class="text-xs md:text-sm text-amber-800 mt-1">Petugas melaporkan ukuran sampah aktual lebih besar dari pesanan. Mohon lakukan pembayaran selisih harga sebesar <b>Rp10.000</b>.</p>
+                    <p class="text-[10px] text-amber-700 mt-1 font-medium">*Setelah pembayaran, jadwal akan diatur ulang ke hari kerja berikutnya.</p>
+                    <button @click="showSelisihModal = true" class="mt-3 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 px-4 py-2 rounded-xl transition-colors shadow-sm">Bayar Sekarang</button>
+                </div>
+            </div>
+        </template>
+
         <!-- Coin Balance Card -->
         <div class="bg-gradient-to-br from-amber-400 to-amber-500 rounded-3xl p-6 md:p-8 text-white shadow-xl shadow-amber-500/20 relative overflow-hidden transition-transform hover:scale-[1.01] duration-300">
             <div class="relative z-10 flex items-center justify-between">
@@ -297,5 +326,42 @@
             </div>
         </div>
     </div>
+
+    <!-- Selisih Payment Modal -->
+    <div x-show="showSelisihModal" x-transition.opacity class="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-center justify-center p-4" style="display:none;" @click.self="showSelisihModal = false">
+        <div x-show="showSelisihModal" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden relative p-6 space-y-6 text-center">
+            
+            <h3 class="font-black text-xl text-on-surface">Pembayaran Selisih</h3>
+            <p class="text-sm text-on-surface-variant">Scan QR Code di bawah ini untuk membayar tagihan selisih ukuran pesanan.</p>
+            
+            <div class="bg-white p-4 rounded-3xl border border-outline shadow-sm inline-block mx-auto relative overflow-hidden">
+                <img src="{{ asset('images/mock_qr.png') }}" alt="QRIS Mockup" class="w-48 h-48 md:w-56 md:h-56 object-cover rounded-xl" :class="isPayingSelisih ? 'opacity-50 blur-sm' : ''" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=SelisihPayment';">
+                
+                <div x-show="isPayingSelisih" class="absolute inset-0 flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <span class="text-sm font-bold text-amber-500">Memverifikasi...</span>
+                </div>
+            </div>
+
+            <div class="bg-surface-variant p-4 rounded-2xl flex justify-between items-center text-left">
+                <div>
+                    <p class="text-xs font-bold text-on-surface-variant mb-1">Total Bayar</p>
+                    <p class="text-lg font-black text-primary">Rp10.000</p>
+                </div>
+                <span class="text-xs font-bold bg-white px-2 py-1 rounded shadow-sm">EcoTrash Pay</span>
+            </div>
+
+            <button @click="paySelisih()" :disabled="isPayingSelisih" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-all flex items-center justify-center gap-2">
+                <span x-show="!isPayingSelisih" class="material-symbols-outlined">qr_code_scanner</span>
+                <span x-text="isPayingSelisih ? 'Memproses...' : 'Cek Status Pembayaran'"></span>
+            </button>
+            <button @click="showSelisihModal = false" x-show="!isPayingSelisih" class="w-full text-sm font-bold text-on-surface-variant py-2 hover:text-on-surface transition-colors">Nanti Saja</button>
+        </div>
+    </div>
+
 </div>
 @endsection

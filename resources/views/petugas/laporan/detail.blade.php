@@ -33,13 +33,13 @@
                     <div id="map" class="w-full h-full"></div>
                 </div>
                 <div class="p-5">
-                    <div class="flex items-start gap-4 mb-3">
-                        <div class="flex-1">
+                    <div class="mb-4">
+                        <div class="mb-3">
                             <h2 class="text-base font-black text-on-surface leading-tight mb-1">Lahan Kosong Depan Minimarket</h2>
                             <p class="text-xs font-bold text-on-surface-variant">Komp. Permata Hijau</p>
                         </div>
-                        <a href="https://maps.google.com/?q=-6.9730,107.6300" target="_blank" class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors">
-                            <span class="material-symbols-outlined">directions</span>
+                        <a href="https://maps.google.com/?q=-6.9730,107.6300" target="_blank" class="w-full bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold py-3 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 text-sm">
+                            <span class="material-symbols-outlined text-[20px]">map</span> Buka di Google Maps
                         </a>
                     </div>
                     <div class="bg-surface border border-outline rounded-2xl p-4">

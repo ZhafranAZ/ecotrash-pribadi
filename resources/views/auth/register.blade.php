@@ -43,9 +43,18 @@
                         placeholder="Masukkan nama lengkap Anda">
                 </div>
 
+                <!-- Phone Number -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="no_telepon" class="block font-medium text-sm text-on-surface">Nomor Telepon</label>
+                    <input id="no_telepon" type="tel" name="no_telepon" required
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
+                        placeholder="Contoh: 081234567890">
+                    <p class="text-xs text-on-surface-variant">Nomor telepon dapat diubah nanti melalui pengaturan profil.</p>
+                </div>
+
                 <!-- Email Address -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="email" class="block font-medium text-sm text-on-surface">Email / Kontak</label>
+                    <label for="email" class="block font-medium text-sm text-on-surface">Email</label>
                     <input id="email" type="email" name="email" required autocomplete="username"
                         class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
                         placeholder="contoh@email.com">

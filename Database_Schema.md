@@ -16,6 +16,7 @@ erDiagram
     USERS ||--o{ LAPORAN : "melaporkan (warga)"
     USERS ||--o{ LAPORAN : "menyelesaikan (petugas)"
     USERS }o--o{ ARTIKEL : "bookmark (warga)"
+    USERS ||--o{ NOTIFIKASI : "menerima"
     
     KOMPLEK ||--o{ ALAMAT_WARGA : "terletak di"
     KOMPLEK ||--o{ PESANAN : "lokasi pesanan"
@@ -23,6 +24,7 @@ erDiagram
 
     ALAMAT_WARGA }|..|| USERS : "user_id"
     PESANAN }|..|| USERS : "warga_id / petugas_id"
+    NOTIFIKASI }|..|| USERS : "user_id"
 ```
 
 ---
@@ -34,6 +36,8 @@ Menyimpan semua akun pengguna dengan pemisahan akses menggunakan kolom `role`.
 - `id` (Primary Key, BigInt)
 - `nama` (String)
 - `email` (String, Unique)
+- `no_telepon` (String, Nullable) -> *Wajib diisi saat daftar warga, bisa diubah di pengaturan*
+- `foto_profil` (String/URL, Nullable)
 - `password` (String, Hashed)
 - `role` (Enum: 'admin', 'warga', 'petugas')
 - `saldo_koin` (Integer, Default: 0) -> *Hanya untuk warga*
@@ -59,7 +63,9 @@ Satu warga bisa memiliki lebih dari satu alamat tersimpan.
 - `id` (Primary Key, BigInt)
 - `warga_id` (Foreign Key -> `users.id`)
 - `komplek_id` (Foreign Key -> `komplek.id`)
-- `blok_nomor_rumah` (String)
+- `nama_alamat` (String) -> *Cth: Rumah, Kantor*
+- `blok_nomor_rumah` (String) -> *Alamat lengkap*
+- `detail_patokan` (Text, Nullable) -> *Cth: Pagar Hitam, Depan Warung*
 - `is_utama` (Boolean, Default: false)
 - `created_at`, `updated_at` (Timestamp)
 
@@ -70,6 +76,9 @@ Tabel *single-row* atau *key-value* untuk menyimpan konfigurasi dari Admin.
 - `harga_kategori_kecil` (Integer)
 - `harga_kategori_sedang` (Integer)
 - `harga_kategori_besar` (Integer)
+- `bonus_koin_kecil` (Integer)
+- `bonus_koin_sedang` (Integer)
+- `bonus_koin_besar` (Integer)
 - `batas_waktu_pesan` (Time) -> *Cut-off time pesanan harian*
 - `kuota_pesanan_harian` (Integer)
 - `hari_operasional` (JSON) -> *Contoh: ["Senin", "Selasa", "Kamis"]*
@@ -86,12 +95,17 @@ Tabel transaksi utama untuk layanan angkut sampah.
 - `nama_hari_penjemputan` (String)
 - `catatan_warga` (Text, Nullable)
 - `koin_digunakan` (Integer, Default: 0)
-- `total_harga_akhir` (Integer)
-- `status` (Enum: 'menunggu_pembayaran', 'menunggu', 'diproses', 'selesai', 'dibatalkan', 'hold_kapasitas', 'gagal_pickup')
+- `koin_didapat` (Integer, Default: 0) -> *Koin reward setelah selesai*
+- `harga_awal` (Integer) -> *Harga saat pesanan dibuat*
+- `total_harga_akhir` (Integer) -> *Harga setelah perubahan ukuran*
+- `selisih_harga` (Integer, Default: 0) -> *Beda harga awal dan akhir*
+- `status` (Enum: 'menunggu_pembayaran', 'menunggu_pembayaran_selisih', 'menunggu', 'diproses', 'selesai', 'dibatalkan', 'hold_kapasitas', 'gagal_pickup')
 - `status_pembayaran` (Enum: 'unpaid', 'paid', 'failed')
 - `metode_pembayaran` (Enum: 'qris', 'transfer_bank')
 - `petugas_id` (Foreign Key -> `users.id`, Nullable) -> *Di-assign oleh admin setelah paid*
 - `ukuran_aktual_laporan_petugas` (Enum: 'sedang', 'besar', Nullable) -> *Terisi jika ada kasus beda ukuran*
+- `alasan_kendala` (Text, Nullable) -> *Catatan saat petugas menemui kendala (cth: pagar tertutup)*
+- `foto_kendala` (String/URL, Nullable) -> *Foto bukti kendala*
 - `foto_bukti_selesai` (String/URL, Nullable)
 - `created_at`, `updated_at` (Timestamp)
 
@@ -121,4 +135,14 @@ Tabel untuk penanganan sampah ilegal.
 ### 8. `bookmark_artikel` (Tabel Pivot)
 - `warga_id` (Foreign Key -> `users.id`)
 - `artikel_id` (Foreign Key -> `artikel_edukasi.id`)
+- `created_at` (Timestamp)
+
+### 9. `notifikasi`
+Tabel untuk menyimpan notifikasi persisten yang muncul di panel bel/lonceng Warga maupun Admin.
+- `id` (Primary Key, BigInt)
+- `user_id` (Foreign Key -> `users.id`)
+- `judul` (String)
+- `pesan` (Text)
+- `tipe` (Enum: 'info', 'warning', 'success', 'error')
+- `is_read` (Boolean, Default: false)
 - `created_at` (Timestamp)

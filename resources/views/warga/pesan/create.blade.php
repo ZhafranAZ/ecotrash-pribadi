@@ -124,6 +124,7 @@
                             <div class="flex-1 md:w-full">
                                 <p class="font-bold text-sm md:text-base text-on-surface">Kecil</p>
                                 <p class="text-xs text-on-surface-variant mt-1">1-2 Kantong Kresek</p>
+                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+10 Koin Eco</p>
                             </div>
                             <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Kecil'">Rp15.000</p>
                         </label>
@@ -133,6 +134,7 @@
                             <div class="flex-1 md:w-full">
                                 <p class="font-bold text-sm md:text-base text-on-surface">Sedang</p>
                                 <p class="text-xs text-on-surface-variant mt-1">1 Tempat Sampah Penuh</p>
+                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+20 Koin Eco</p>
                             </div>
                             <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Sedang'">Rp25.000</p>
                         </label>
@@ -142,6 +144,7 @@
                             <div class="flex-1 md:w-full">
                                 <p class="font-bold text-sm md:text-base text-on-surface">Besar</p>
                                 <p class="text-xs text-on-surface-variant mt-1">>2 Tempat Sampah</p>
+                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+35 Koin Eco</p>
                             </div>
                             <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Besar'">Rp40.000</p>
                         </label>

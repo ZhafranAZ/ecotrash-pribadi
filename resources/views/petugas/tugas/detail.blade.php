@@ -34,16 +34,20 @@
                     <div class="flex-1">
                         <p class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md inline-block mb-1">Angkut Sampah</p>
                         <h2 class="text-lg font-black text-on-surface leading-tight">Jl. Merdeka No. 45, Blok C</h2>
-                        <p class="text-sm font-medium text-on-surface-variant mt-1">Bpk. Budi Santoso</p>
+                        <p class="text-xs font-bold text-on-surface-variant mt-0.5 italic">{{ $detail_patokan ?? 'Pagar Hitam, Depan Warung' }}</p>
+                        <p class="text-sm font-medium text-on-surface mt-2">Bpk. Budi Santoso</p>
                     </div>
                     <a href="tel:08123456789" class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors">
                         <span class="material-symbols-outlined text-[20px]">call</span>
                     </a>
                 </div>
                 
-                <div class="bg-surface border border-outline rounded-2xl p-4 flex items-start gap-2">
-                    <span class="material-symbols-outlined text-orange-500 text-[18px] shrink-0 mt-0.5">info</span>
-                    <p class="text-xs font-bold text-on-surface-variant leading-relaxed">Tolong panggil nomor rumah jika pagar dikunci. Anjing penjaga sudah diikat.</p>
+                <div class="bg-orange-50/50 border border-orange-200 rounded-2xl p-4 flex items-start gap-2">
+                    <span class="material-symbols-outlined text-orange-500 text-[18px] shrink-0 mt-0.5">description</span>
+                    <div>
+                        <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider mb-0.5">Catatan Pesanan</p>
+                        <p class="text-xs font-bold text-on-surface-variant leading-relaxed">{{ $catatan_warga ?? 'Tolong panggil nomor rumah jika pagar dikunci. Anjing penjaga sudah diikat.' }}</p>
+                    </div>
                 </div>
             </div>
 

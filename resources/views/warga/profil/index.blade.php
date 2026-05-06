@@ -18,6 +18,13 @@
     showEditAddressForm: false,
     primaryId: 1,
     editingAddress: { id: null, title: '', komplek: '', detail: '' },
+    profileImage: null,
+    handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (file) {
+            this.profileImage = URL.createObjectURL(file);
+        }
+    },
     addresses: [
         { id: 1, title: 'Rumah', komplek: 'Bunga Asri', detail: 'Blok C2 No. 15, RT 04 RW 02, Kec. Sukajadi' },
         { id: 2, title: 'Kantor', komplek: 'Griya Indah', detail: 'Gedung X Lt. 4, Sudirman, Jakarta' }
@@ -37,19 +44,27 @@
 }">
     
     <!-- Left Column: Profile Card (Desktop) / Mobile Header -->
-    <div class="md:col-span-4 bg-white md:rounded-3xl md:shadow-sm md:border md:border-outline md:p-8 md:sticky md:top-28">
+    <div class="md:col-span-4 bg-white md:rounded-3xl md:shadow-sm md:border md:border-primary/20 md:p-8 md:sticky md:top-28">
         <div class="flex flex-col items-center justify-center pt-4 pb-8 md:py-0 relative">
             <div class="absolute top-0 w-full h-24 bg-gradient-to-b from-primary/10 to-transparent -mx-4 px-4 rounded-b-3xl md:hidden"></div>
             
-            <div class="w-28 h-28 md:w-36 md:h-36 rounded-full bg-surface flex items-center justify-center text-primary text-5xl md:text-6xl font-black mb-4 border-4 border-white shadow-lg relative z-10">
-                B
-                <button @click="showEditProfileModal = true" class="absolute bottom-1 right-1 w-10 h-10 bg-primary border-2 border-white rounded-full flex items-center justify-center text-white shadow-sm hover:bg-primary-dark hover:scale-110 transition-all">
-                    <span class="material-symbols-outlined text-[18px]">edit</span>
-                </button>
+            <div class="w-28 h-28 md:w-36 md:h-36 rounded-full bg-surface flex items-center justify-center text-primary text-5xl md:text-6xl font-black mb-4 border-4 border-white shadow-lg relative z-10 overflow-hidden group">
+                <template x-if="!profileImage">
+                    <span>B</span>
+                </template>
+                <template x-if="profileImage">
+                    <img :src="profileImage" alt="Profile" class="w-full h-full object-cover">
+                </template>
+                
+                <label for="profile_upload" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
+                    <span class="material-symbols-outlined text-[32px]">photo_camera</span>
+                </label>
+                <input type="file" id="profile_upload" accept="image/*" class="hidden" @change="handleImageUpload">
             </div>
-            <h2 class="font-black text-2xl md:text-3xl text-on-surface z-10 mt-1">Budi Santoso</h2>
-            <p class="text-sm md:text-base font-medium text-on-surface-variant z-10 mt-1">budi.s@example.com</p>
-            <div class="mt-4 flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full text-amber-600 font-bold shadow-sm">
+
+            <h2 class="font-black text-2xl md:text-3xl text-on-surface z-10">Budi Santoso</h2>
+            <p class="text-sm md:text-base font-medium text-on-surface-variant z-10">budi.s@example.com</p>
+            <div class="mt-4 flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full text-amber-600 font-bold shadow-sm z-10">
                 <span class="material-symbols-outlined">generating_tokens</span>
                 450 Koin Eco
             </div>
@@ -63,9 +78,20 @@
             <p class="text-on-surface-variant mt-1">Kelola preferensi, alamat penjemputan, dan keamanan akun Anda.</p>
         </div>
 
-        <div class="bg-white border border-outline rounded-3xl overflow-hidden shadow-sm md:shadow-none md:border-none md:bg-transparent md:space-y-4">
+        <div class="bg-white border border-primary/20 rounded-3xl overflow-hidden shadow-sm md:shadow-none md:border-none md:bg-transparent md:space-y-4">
             
-            <button @click="showAddressModal = true" class="w-full text-left flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-outline md:border md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-primary/50 transition-colors active:bg-surface-dim group">
+            <button @click="showEditProfileModal = true" class="w-full text-left flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-primary/20 md:border md:border-primary/20 md:rounded-2xl md:bg-white hover:bg-primary/5 md:hover:border-primary transition-colors active:bg-primary/10 group">
+                <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-[24px]">manage_accounts</span>
+                </div>
+                <div class="flex-1">
+                    <p class="font-bold text-base md:text-lg text-on-surface">Ubah Informasi Profil</p>
+                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">Nama, Email, dan Nomor Telepon</p>
+                </div>
+                <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+            </button>
+            
+            <button @click="showAddressModal = true" class="w-full text-left flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-primary/20 md:border md:border-primary/20 md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-primary/50 transition-colors active:bg-surface-dim group">
                 <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[24px]">home_pin</span>
                 </div>
@@ -76,7 +102,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
             </button>
             
-            <a href="{{ route('warga.edukasi.tersimpan') }}" class="flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-outline md:border md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-amber-500/50 transition-colors active:bg-surface-dim group">
+            <a href="{{ route('warga.edukasi.tersimpan') }}" class="flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-primary/20 md:border md:border-primary/20 md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-amber-500/50 transition-colors active:bg-surface-dim group">
                 <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0 group-hover:bg-amber-500 group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">bookmarks</span>
                 </div>
@@ -87,7 +113,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
             </a>
 
-            <button @click="showSecurityModal = true" class="w-full text-left flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-outline md:border md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-primary/50 transition-colors active:bg-surface-dim group">
+            <button @click="showSecurityModal = true" class="w-full text-left flex items-center gap-4 md:gap-6 p-4 md:p-6 border-b border-primary/20 md:border md:border-primary/20 md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-primary/50 transition-colors active:bg-surface-dim group">
                 <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-surface-dim flex items-center justify-center text-on-surface-variant shrink-0 group-hover:bg-on-surface group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[24px]">lock</span>
                 </div>
@@ -98,7 +124,7 @@
                 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
             </button>
 
-            <a href="{{ route('warga.bantuan') }}" class="flex items-center gap-4 md:gap-6 p-4 md:p-6 md:border md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-blue-500/50 transition-colors active:bg-surface-dim group">
+            <a href="{{ route('warga.bantuan') }}" class="flex items-center gap-4 md:gap-6 p-4 md:p-6 md:border md:border-primary/20 md:rounded-2xl md:bg-white hover:bg-surface-variant md:hover:border-blue-500/50 transition-colors active:bg-surface-dim group">
                 <div class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-[24px]">support_agent</span>
                 </div>
@@ -231,6 +257,10 @@
              x-transition:enter-end="opacity-100 scale-100 translate-y-0">
             <h3 class="font-bold text-lg text-on-surface mb-2">Tambah Alamat Baru</h3>
             <div>
+                <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Alamat (Misal: Rumah, Kantor)</label>
+                <input type="text" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white">
+            </div>
+            <div>
                 <label class="text-xs font-bold text-on-surface-variant block mb-1">Pilih Perumahan/Komplek</label>
                 <div class="relative">
                     <select class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white appearance-none cursor-pointer">
@@ -243,7 +273,7 @@
                 </div>
             </div>
             <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Alamat Lengkap</label>
+                <label class="text-xs font-bold text-on-surface-variant block mb-1">Alamat Lengkap (Blok/Nomor Rumah)</label>
                 <textarea rows="3" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Nama Jalan, RT/RW, Kelurahan"></textarea>
             </div>
             <div>

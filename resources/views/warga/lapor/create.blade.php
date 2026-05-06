@@ -45,11 +45,19 @@
         </div>
         
         <!-- UI Over Map (Mobile Top, Desktop Bottom Right) -->
-        <div class="absolute top-4 left-4 right-4 md:top-auto md:bottom-6 md:left-auto md:right-6 z-20 pointer-events-auto flex items-start gap-3 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg md:max-w-sm border border-outline transition-transform hover:scale-105">
-            <span class="material-symbols-outlined text-primary text-[28px]">info</span>
-            <div>
-                <p class="text-sm md:text-base font-bold text-on-surface">Tentukan Lokasi Akurat</p>
-                <p class="text-xs md:text-sm text-on-surface-variant mt-1">Geser peta untuk memastikan pin berada tepat di lokasi tumpukan sampah liar.</p>
+        <div class="absolute top-4 left-4 right-4 md:top-auto md:bottom-6 md:left-auto md:right-6 z-20 pointer-events-auto flex flex-col items-end gap-3">
+            
+            <button @click="map.setView([-6.200000, 106.816666], 15)" class="bg-white/95 backdrop-blur-md text-primary font-bold p-3 rounded-full shadow-lg border border-outline flex items-center justify-center hover:bg-surface-variant transition-colors group tooltip-trigger relative">
+                <span class="material-symbols-outlined group-hover:scale-110 transition-transform">my_location</span>
+                <span class="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-surface-variant text-on-surface text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Lokasi Saat Ini</span>
+            </button>
+
+            <div class="flex items-start gap-3 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-lg md:max-w-sm border border-outline w-full transition-transform hover:scale-[1.02]">
+                <span class="material-symbols-outlined text-primary text-[28px]">info</span>
+                <div>
+                    <p class="text-sm md:text-base font-bold text-on-surface">Tentukan Lokasi Akurat</p>
+                    <p class="text-xs md:text-sm text-on-surface-variant mt-1">Geser peta untuk memastikan pin berada tepat di lokasi tumpukan sampah liar.</p>
+                </div>
             </div>
         </div>
 

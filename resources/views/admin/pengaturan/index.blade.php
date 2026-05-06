@@ -71,6 +71,37 @@
                 </div>
             </div>
 
+            <!-- Bonus Koin -->
+            <div>
+                <label class="block font-medium text-sm text-on-surface mb-3">Bonus Koin Reward Warga (Berdasarkan Ukuran)</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Kecil -->
+                    <div class="border border-outline-variant rounded-lg p-4 bg-white">
+                        <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Kecil</p>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-medium material-symbols-outlined text-[18px]">generating_tokens</span>
+                            <input type="number" value="10" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        </div>
+                    </div>
+                    <!-- Sedang -->
+                    <div class="border border-outline-variant rounded-lg p-4 bg-white">
+                        <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Sedang</p>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-medium material-symbols-outlined text-[18px]">generating_tokens</span>
+                            <input type="number" value="20" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        </div>
+                    </div>
+                    <!-- Besar -->
+                    <div class="border border-outline-variant rounded-lg p-4 bg-white">
+                        <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Besar</p>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-medium material-symbols-outlined text-[18px]">generating_tokens</span>
+                            <input type="number" value="35" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="pt-4 border-t border-outline-variant">
                 <button type="button" class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg font-bold transition-colors">Simpan Perubahan Harga</button>
             </div>

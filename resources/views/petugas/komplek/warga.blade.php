@@ -14,6 +14,13 @@
 
     <div class="px-4 py-6 pb-24 space-y-4">
         
+        <!-- Action Button -->
+        <div class="mb-2">
+            <a href="https://maps.google.com/?q=Perumahan+Asri+Indah" target="_blank" class="w-full bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold py-3.5 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 text-sm">
+                <span class="material-symbols-outlined text-[20px]">map</span> Buka di Google Maps
+            </a>
+        </div>
+
         <div class="flex items-center justify-between mb-4 px-1">
             <h2 class="text-lg font-black text-on-surface">Daftar Titik Penjemputan</h2>
             <span class="text-xs font-bold text-on-surface-variant">8 Titik tersisa</span>

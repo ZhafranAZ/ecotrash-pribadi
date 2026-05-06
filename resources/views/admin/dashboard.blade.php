@@ -114,17 +114,22 @@
 
         // Custom Icons
         const tpsIcon = L.divIcon({
-            className: 'custom-icon',
-            html: `<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.3);"></div>`,
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
+            className: 'custom-icon border-none bg-transparent',
+            html: `<div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center border-2 border-white shadow-md relative cursor-pointer hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-[18px]">location_city</span>
+                   </div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
         });
 
         const liarIcon = L.divIcon({
-            className: 'custom-icon',
-            html: `<div style="background-color: #ef4444; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.3); animation: pulse 2s infinite;"></div>`,
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
+            className: 'custom-icon border-none bg-transparent',
+            html: `<div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center border-2 border-white shadow-md relative cursor-pointer hover:scale-110 transition-transform">
+                        <span class="absolute inset-0 rounded-full border border-red-500 animate-ping opacity-75"></span>
+                        <span class="material-symbols-outlined text-[18px] relative z-10">report</span>
+                   </div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
         });
 
         markers.forEach(m => {

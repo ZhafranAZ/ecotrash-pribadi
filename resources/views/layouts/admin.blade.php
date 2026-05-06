@@ -37,9 +37,9 @@
     <div x-show="sidebarOpen" class="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity" @click="sidebarOpen = false" x-transition.opacity></div>
 
     <!-- Sidebar -->
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-outline z-50 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 shadow-sm flex flex-col">
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-outline z-50 transition-transform duration-300 lg:translate-x-0 shadow-sm flex flex-col">
         <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-outline">
+        <div class="h-16 flex items-center px-6 border-b border-outline sticky top-0 bg-white z-10">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 text-primary hover:text-primary-dark transition-colors">
                 <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">eco</span>
                 <span class="font-title-md font-bold tracking-tight">EcoTrash Admin</span>
@@ -75,7 +75,7 @@
         </nav>
 
         <!-- Profile / Logout -->
-        <div class="p-4 border-t border-outline">
+        <div class="p-4 border-t border-outline sticky bottom-0 bg-white z-10">
             <div class="flex items-center gap-3 mb-3 px-2">
                 <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
                     A
@@ -97,7 +97,7 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden lg:pl-64">
         <!-- Topbar -->
         <header class="h-16 bg-white border-b border-outline flex items-center justify-between px-4 lg:px-8 shadow-sm z-30">
             <!-- Mobile Menu Button -->

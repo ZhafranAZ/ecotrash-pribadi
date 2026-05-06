@@ -1,5 +1,11 @@
 <x-petugas-layout>
     <div x-data="{ 
+        fotoPreview: null,
+        handleFile(e) {
+            if(e.target.files.length > 0){
+                this.fotoPreview = URL.createObjectURL(e.target.files[0]);
+            }
+        },
         showDaruratModal: false, 
         daruratState: 'form', // 'form' -> 'success'
         showLogoutModal: false
@@ -13,8 +19,20 @@
             
             <!-- Profile Card -->
             <div class="glass-card rounded-3xl p-6 text-center relative overflow-hidden">
-                <div class="w-24 h-24 rounded-full bg-primary/20 text-primary flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
-                    <span class="material-symbols-outlined text-[48px]">account_circle</span>
+                <div class="relative w-24 h-24 mx-auto mb-4">
+                    <template x-if="!fotoPreview">
+                        <div class="w-full h-full rounded-full bg-primary/20 text-primary flex items-center justify-center border-4 border-white shadow-sm">
+                            <span class="material-symbols-outlined text-[48px]">account_circle</span>
+                        </div>
+                    </template>
+                    <template x-if="fotoPreview">
+                        <img :src="fotoPreview" class="w-full h-full rounded-full object-cover border-4 border-white shadow-sm">
+                    </template>
+                    
+                    <label for="foto_profil" class="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-primary-dark transition-colors border-2 border-white">
+                        <span class="material-symbols-outlined text-[16px]">edit</span>
+                    </label>
+                    <input type="file" id="foto_profil" accept="image/*" class="hidden" @change="handleFile">
                 </div>
                 <h2 class="text-xl font-black text-on-surface mb-1">Ahmad Sobari</h2>
                 <p class="text-sm font-bold text-on-surface-variant">ID: PTG-2026-001</p>
