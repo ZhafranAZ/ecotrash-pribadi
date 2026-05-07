@@ -21,13 +21,15 @@
 
 <body class="bg-background text-on-background font-body-md antialiased selection:bg-primary/20 selection:text-primary">
     <!-- Sticky Header -->
-    <header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant transition-all">
-        <div class="max-w-[1280px] mx-auto px-10 flex items-center justify-between h-[72px]">
+    <header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant transition-all" x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-[1280px] mx-auto px-6 md:px-10 flex items-center justify-between h-[72px]">
             <div class="flex items-center gap-3 text-primary">
                 <span class="material-symbols-outlined text-[28px]"
                     style="font-variation-settings: 'FILL' 1;">eco</span>
                 <h2 class="text-on-surface font-title-sm font-bold tracking-tight">EcoTrash</h2>
             </div>
+            
+            <!-- Desktop Nav -->
             <nav class="hidden md:flex items-center gap-8">
                 <a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors"
                     href="#">Beranda</a>
@@ -38,39 +40,57 @@
                 <a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors"
                     href="#kontak">Kontak</a>
             </nav>
-            <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-4">
                 <a href="/login"
                     class="text-primary hover:text-primary-dark text-sm font-bold transition-all hover:-translate-y-0.5 active:scale-95">Masuk</a>
                 <a href="/register"
-                    class="bg-primary hover:bg-primary-dark text-on-primary text-sm font-bold h-10 px-6 rounded-lg transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 active:scale-95 flex items-center justify-center">
+                    class="bg-primary hover:bg-primary-dark text-white text-sm font-bold h-10 px-6 rounded-lg transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 active:scale-95 flex items-center justify-center">
                     Daftar Akun
                 </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-on-surface hover:bg-surface-variant rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-[28px]" x-text="mobileMenuOpen ? 'close' : 'menu'">menu</span>
+            </button>
+        </div>
+
+        <!-- Mobile Dropdown -->
+        <div x-show="mobileMenuOpen" x-transition x-cloak class="md:hidden absolute top-[72px] left-0 w-full bg-white border-b border-outline-variant shadow-lg py-4 px-6 flex flex-col gap-4">
+            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#">Beranda</a>
+            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#fitur">Fitur</a>
+            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#cara-kerja">Cara Kerja</a>
+            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#kontak">Kontak</a>
+            <hr class="border-outline-variant/50">
+            <div class="flex flex-col gap-3 pt-2">
+                <a href="/login" class="text-primary font-bold text-center border border-primary rounded-lg py-3">Masuk</a>
+                <a href="/register" class="bg-primary text-white font-bold text-center rounded-lg py-3 shadow-md">Daftar Akun</a>
             </div>
         </div>
     </header>
 
     <main>
         <!-- Hero Section -->
-        <section class="relative pt-12 pb-24 px-10 overflow-hidden">
+        <section class="relative pt-6 pb-20 md:pt-12 md:pb-24 px-6 md:px-10 overflow-hidden">
             <div class="max-w-[1280px] mx-auto">
-                <div class="rounded-[24px] overflow-hidden relative min-h-[560px] flex items-center"
+                <div class="rounded-[24px] overflow-hidden relative min-h-[480px] md:min-h-[560px] flex items-center"
                     style="background-image: linear-gradient(to right, rgba(18, 28, 42, 0.9) 0%, rgba(18, 28, 42, 0.4) 100%), url('http://127.0.0.1:8000/images/Landingpage_Title.png'); background-size: cover; background-position: center;">
-                    <div class="relative z-10 max-w-[640px] px-8 md:px-16 py-12 flex flex-col gap-6">
+                    <div class="relative z-10 max-w-[640px] px-6 md:px-16 py-10 md:py-12 flex flex-col gap-6">
                         <span
                             class="inline-flex items-center self-start gap-1.5 px-3 py-1 rounded-full bg-primary/20 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-primary/30">
                             <span class="material-symbols-outlined text-[14px]">stars</span> Premium Service
                         </span>
                         <h1
-                            class="text-white text-[40px] md:text-display-lg font-bold leading-tight tracking-[-0.02em]">
+                            class="text-white text-[32px] md:text-display-lg font-bold leading-tight tracking-[-0.02em]">
                             Kelola Sampah Komplek Lebih Mudah, Bersih, dan Menguntungkan
                         </h1>
-                        <p class="text-white text-lg md:text-[18px] leading-relaxed max-w-[540px]">
+                        <p class="text-white text-base md:text-[18px] leading-relaxed max-w-[540px]">
                             Jadwalkan penjemputan sampah, laporkan masalah kebersihan dengan cepat, dan dapatkan koin
                             reward untuk setiap aksi baik Anda demi lingkungan.
                         </p>
-                        <div class="pt-4 flex flex-wrap gap-4">
+                        <div class="pt-4 flex flex-col sm:flex-row gap-4">
                             <a href="#cta"
-                                class="bg-primary hover:bg-primary-dark text-on-primary text-base font-bold h-12 px-8 rounded-lg transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/30 active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 inline-flex">
+                                class="bg-primary hover:bg-primary-dark text-white text-base font-bold h-12 px-8 rounded-lg transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/30 active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-primary/20 text-center">
                                 Mulai Bersihkan Lingkungan
                             </a>
                         </div>
@@ -80,7 +100,7 @@
         </section>
 
         <!-- Features Section -->
-        <section class="py-20 px-10 bg-surface" id="fitur">
+        <section class="py-16 md:py-20 px-6 md:px-10 bg-surface" id="fitur">
             <div class="max-w-[1280px] mx-auto flex flex-col gap-12">
                 <div class="flex flex-col gap-4 text-center items-center">
                     <h2 class="text-primary font-label-caps uppercase tracking-[0.05em]">Layanan Cerdas</h2>
@@ -151,8 +171,8 @@
         </section>
 
         <!-- How It Works Section -->
-        <section class="py-24 px-10 bg-surface-container-low overflow-hidden" id="cara-kerja">
-            <div class="max-w-[1280px] mx-auto flex flex-col gap-16 items-center">
+        <section class="py-16 md:py-24 px-6 md:px-10 bg-surface-container-low overflow-hidden" id="cara-kerja">
+            <div class="max-w-[1280px] mx-auto flex flex-col gap-12 md:gap-16 items-center">
                 <div class="flex flex-col gap-4 items-center text-center max-w-[800px]">
                     <h2 class="text-primary font-label-caps uppercase tracking-[0.05em]">Alur Proses</h2>
                     <h3 class="text-on-surface text-[32px] md:text-headline-md font-bold leading-tight">
@@ -987,27 +1007,27 @@
                 </div>
         </section>
         <!-- Pre-Footer CTA -->
-        <section id="cta" class="py-50 px-10 bg-surface">
-            <!-- Background Orbs -->
-            <div
-                class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none">
-            </div>
+        <section id="cta" class="py-20 md:py-32 px-6 md:px-10 bg-surface relative">
+            <!-- Background Glow Left -->
+            <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-[150px] h-[300px] bg-primary/20 blur-[80px] pointer-events-none rounded-r-full"></div>
+            <!-- Background Glow Right -->
+            <div class="absolute top-1/2 right-0 transform -translate-y-1/2 w-[150px] h-[300px] bg-primary/20 blur-[80px] pointer-events-none rounded-l-full"></div>
 
             <div class="max-w-[800px] mx-auto text-center relative z-10 flex flex-col items-center">
                 <div
-                    class="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 border border-primary/20">
-                    <span class="material-symbols-outlined text-[40px] text-primary"
+                    class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 md:mb-8 border border-primary/20">
+                    <span class="material-symbols-outlined text-[32px] md:text-[40px] text-primary"
                         style="font-variation-settings: 'FILL' 1;">eco</span>
                 </div>
-                <h2 class="text-on-surface text-[32px] md:text-[40px] font-bold leading-tight mb-6">
+                <h2 class="text-on-surface text-[28px] md:text-[40px] font-bold leading-tight mb-4 md:mb-6">
                     Siap Mewujudkan Komplek Perumahan yang Lebih Bersih?
                 </h2>
-                <p class="text-on-surface-variant text-lg mb-10 max-w-[600px] mx-auto">
+                <p class="text-on-surface-variant text-base md:text-lg mb-8 md:mb-10 max-w-[600px] mx-auto">
                     Bergabunglah dengan ratusan komplek lainnya yang telah beralih ke pengelolaan sampah modern,
                     efisien, dan menguntungkan.
                 </p>
                 <a href="/register"
-                    class="bg-primary hover:bg-primary-container text-on-primary text-base font-bold h-14 px-10 rounded-xl transition-all hover:scale-105 shadow-[0_10px_20px_-5px_rgba(0,108,73,0.3)] inline-flex items-center justify-center">
+                    class="bg-primary hover:bg-primary-container text-white text-sm md:text-base font-bold h-12 md:h-14 px-8 md:px-10 rounded-xl transition-all hover:scale-105 shadow-[0_10px_20px_-5px_rgba(0,108,73,0.3)] inline-flex items-center justify-center text-center">
                     Daftar Akun Warga Sekarang
                 </a>
             </div>
@@ -1016,7 +1036,7 @@
 
     <!-- Footer -->
     <footer id="kontak"
-        class="bg-gradient-to-b from-primary-darker to-primary text-white/90 pt-16 pb-8 px-10 relative overflow-hidden">
+        class="bg-gradient-to-b from-primary-darker to-primary text-white/90 pt-16 pb-8 px-6 md:px-10 relative overflow-hidden">
         <div class="max-w-[1280px] mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-white/10 pb-12 mb-8">
                 <div class="md:col-span-2 flex flex-col gap-4">
