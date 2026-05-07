@@ -20,7 +20,10 @@ erDiagram
     
     KOMPLEK ||--o{ ALAMAT_WARGA : "terletak di"
     KOMPLEK ||--o{ PESANAN : "lokasi pesanan"
+    KOMPLEK ||--o{ LAPORAN : "lokasi laporan"
     KOMPLEK ||--o{ USERS : "area tugas (petugas)"
+
+    PESANAN ||--o{ RIWAYAT_PESANAN : "memiliki track"
 
     ALAMAT_WARGA }|..|| USERS : "user_id"
     PESANAN }|..|| USERS : "warga_id / petugas_id"
@@ -89,7 +92,9 @@ Tabel transaksi utama untuk layanan angkut sampah.
 - `id` (Primary Key, UUID/String) -> *Bisa diformat sebagai resi, misal: INV-1234*
 - `warga_id` (Foreign Key -> `users.id`)
 - `komplek_id` (Foreign Key -> `komplek.id`)
+- `nama_alamat_snapshot` (String) -> *Snapshot nama alamat (cth: Rumah Utama)*
 - `blok_nomor_rumah` (String) -> *Snapshotted saat pesan, berjaga-jaga jika alamat warga dihapus*
+- `detail_patokan_snapshot` (Text, Nullable) -> *Snapshot patokan alamat*
 - `kategori_sampah` (Enum: 'kecil', 'sedang', 'besar')
 - `tanggal_penjemputan` (Date)
 - `nama_hari_penjemputan` (String)
@@ -102,6 +107,7 @@ Tabel transaksi utama untuk layanan angkut sampah.
 - `status` (Enum: 'menunggu_pembayaran', 'menunggu_pembayaran_selisih', 'menunggu', 'diproses', 'selesai', 'dibatalkan', 'hold_kapasitas', 'gagal_pickup')
 - `status_pembayaran` (Enum: 'unpaid', 'paid', 'failed')
 - `metode_pembayaran` (Enum: 'qris', 'transfer_bank')
+- `payment_reference` (String, Nullable) -> *Menyimpan ID transaksi dari Payment Gateway (misal QRIS)*
 - `petugas_id` (Foreign Key -> `users.id`, Nullable) -> *Di-assign oleh admin setelah paid*
 - `ukuran_aktual_laporan_petugas` (Enum: 'sedang', 'besar', Nullable) -> *Terisi jika ada kasus beda ukuran*
 - `alasan_kendala` (Text, Nullable) -> *Catatan saat petugas menemui kendala (cth: pagar tertutup)*
@@ -113,8 +119,10 @@ Tabel transaksi utama untuk layanan angkut sampah.
 Tabel untuk penanganan sampah ilegal.
 - `id` (Primary Key, BigInt)
 - `warga_id` (Foreign Key -> `users.id`)
+- `komplek_id` (Foreign Key -> `komplek.id`, Nullable) -> *Diisi otomatis oleh backend berdasarkan koordinat*
 - `lat` (Decimal)
 - `lng` (Decimal)
+- `alamat_lokasi` (String, Nullable) -> *Teks alamat hasil konversi Reverse Geocoding*
 - `deskripsi` (Text)
 - `foto_laporan_warga` (String/URL)
 - `status` (Enum: 'menunggu', 'disetujui', 'ditolak', 'sedang_dibersihkan', 'selesai')
@@ -141,8 +149,18 @@ Tabel untuk penanganan sampah ilegal.
 Tabel untuk menyimpan notifikasi persisten yang muncul di panel bel/lonceng Warga maupun Admin.
 - `id` (Primary Key, BigInt)
 - `user_id` (Foreign Key -> `users.id`)
+- `reference_id` (BigInt, Nullable) -> *ID entitas terkait (misal ID pesanan atau laporan)*
+- `reference_type` (String, Nullable) -> *Tipe referensi (misal: 'pesanan', 'laporan')*
 - `judul` (String)
 - `pesan` (Text)
 - `tipe` (Enum: 'info', 'warning', 'success', 'error')
 - `is_read` (Boolean, Default: false)
+- `created_at` (Timestamp)
+
+### 10. `riwayat_status_pesanan`
+Tabel untuk merekam audit trail atau rekam jejak status pesanan pengangkutan, digunakan untuk fitur modal pelacakan/tracking waktu real-time.
+- `id` (Primary Key, BigInt)
+- `pesanan_id` (Foreign Key -> `pesanan_pengangkutan.id`)
+- `status` (Enum: 'menunggu_pembayaran', 'menunggu_pembayaran_selisih', 'menunggu', 'diproses', 'selesai', 'dibatalkan', 'hold_kapasitas', 'gagal_pickup')
+- `keterangan` (Text, Nullable) -> *Pesan tambahan (cth: "Pesanan telah dikonfirmasi dan menunggu penugasan petugas")*
 - `created_at` (Timestamp)
