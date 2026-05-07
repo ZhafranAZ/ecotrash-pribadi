@@ -166,7 +166,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full relative"
                     x-data="{ scene: 1, animatingBalance: false }"
-                    x-init="setInterval(() => { scene = scene >= 3 ? 1 : scene + 1; if(scene===3){ animatingBalance=true; setTimeout(()=>animatingBalance=false, 2000); } }, 4500)">
+                    x-init="setInterval(() => { scene = scene >= 4 ? 1 : scene + 1; if(scene===4){ animatingBalance=true; setTimeout(()=>animatingBalance=false, 2000); } }, 4500)">
 
                     <!-- Ambient Glow Background behind the grid -->
                     <div
@@ -213,8 +213,113 @@
                                 }
                             }
 
-                            /* ---- Scene 1: Cursor & Success ---- */
-                            @keyframes s1CursorMove {
+                            /* ---- Scene 1: Daftar & Atur Alamat ---- */
+                            @keyframes s1CardPop {
+                                0% {
+                                    opacity: 0;
+                                    transform: translateY(20px) scale(0.9);
+                                }
+
+                                15%,
+                                85% {
+                                    opacity: 1;
+                                    transform: translateY(0) scale(1);
+                                }
+
+                                100% {
+                                    opacity: 0;
+                                    transform: translateY(-20px) scale(0.9);
+                                }
+                            }
+
+                            @keyframes s1PinDrop {
+
+                                0%,
+                                25% {
+                                    opacity: 0;
+                                    transform: translateY(-40px) scale(1.5);
+                                }
+
+                                35% {
+                                    opacity: 1;
+                                    transform: translateY(0) scale(1);
+                                }
+
+                                40% {
+                                    transform: translateY(-10px);
+                                }
+
+                                45%,
+                                85% {
+                                    transform: translateY(0);
+                                    opacity: 1;
+                                }
+
+                                100% {
+                                    opacity: 0;
+                                    transform: translateY(-20px);
+                                }
+                            }
+
+                            @keyframes s1MapExpand {
+
+                                0%,
+                                15% {
+                                    opacity: 0;
+                                    transform: scaleX(0);
+                                }
+
+                                25%,
+                                85% {
+                                    opacity: 1;
+                                    transform: scaleX(1);
+                                }
+
+                                100% {
+                                    opacity: 0;
+                                    transform: scaleX(0);
+                                }
+                            }
+
+                            @keyframes s1CheckPop {
+
+                                0%,
+                                45% {
+                                    opacity: 0;
+                                    transform: scale(0);
+                                }
+
+                                50%,
+                                85% {
+                                    opacity: 1;
+                                    transform: scale(1);
+                                }
+
+                                100% {
+                                    opacity: 0;
+                                    transform: scale(0);
+                                }
+                            }
+
+                            .s1-card {
+                                animation: s1CardPop 4.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            }
+
+                            .s1-map {
+                                animation: s1MapExpand 4.5s infinite cubic-bezier(0.22, 1, 0.36, 1);
+                                transform-origin: center;
+                            }
+
+                            .s1-pin {
+                                animation: s1PinDrop 4.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            }
+
+                            .s1-check {
+                                animation: s1CheckPop 4.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            }
+
+                            /* ---- Scene 2: Cursor & Success ---- */
+                            @keyframes s2CursorMove {
                                 0% {
                                     transform: translate(100px, 80px);
                                     opacity: 0;
@@ -233,7 +338,6 @@
                                     transform: translate(0, 0) scale(0.85);
                                 }
 
-                                /* click */
                                 65% {
                                     transform: translate(0, 0) scale(1);
                                 }
@@ -249,7 +353,7 @@
                                 }
                             }
 
-                            @keyframes s1Ripple {
+                            @keyframes s2Ripple {
 
                                 0%,
                                 60% {
@@ -267,30 +371,30 @@
                                 }
                             }
 
-                            @keyframes s1SuccessBtn {
+                            @keyframes s2SuccessBtn {
 
                                 0%,
                                 60% {
-                                    fill: #006c49;
+                                    fill: #10b981;
                                     width: 104px;
                                     x: 18px;
                                 }
 
                                 65%,
                                 95% {
-                                    fill: #10b981;
+                                    fill: #059669;
                                     width: 40px;
                                     x: 50px;
                                 }
 
                                 100% {
-                                    fill: #006c49;
+                                    fill: #10b981;
                                     width: 104px;
                                     x: 18px;
                                 }
                             }
 
-                            @keyframes s1SuccessText {
+                            @keyframes s2SuccessText {
 
                                 0%,
                                 55% {
@@ -303,7 +407,7 @@
                                 }
                             }
 
-                            @keyframes s1Checkmark {
+                            @keyframes s2Checkmark {
 
                                 0%,
                                 60% {
@@ -323,45 +427,43 @@
                                 }
                             }
 
-                            .s1-cursor {
-                                animation: s1CursorMove 4.5s infinite cubic-bezier(0.22, 1, 0.36, 1);
+                            .s2-cursor {
+                                animation: s2CursorMove 4.5s infinite cubic-bezier(0.22, 1, 0.36, 1);
+                                transform-origin: top left;
                             }
 
-                            .s1-ripple-1 {
-                                animation: s1Ripple 4.5s 0s infinite ease-out;
+                            .s2-ripple-1 {
+                                animation: s2Ripple 4.5s 0s infinite ease-out;
                             }
 
-                            .s1-ripple-2 {
-                                animation: s1Ripple 4.5s 0.15s infinite ease-out;
+                            .s2-ripple-2 {
+                                animation: s2Ripple 4.5s 0.15s infinite ease-out;
                             }
 
-                            .s1-ripple-3 {
-                                animation: s1Ripple 4.5s 0.3s infinite ease-out;
+                            .s2-ripple-3 {
+                                animation: s2Ripple 4.5s 0.3s infinite ease-out;
                             }
 
-                            .s1-btn {
-                                animation: s1SuccessBtn 4.5s infinite cubic-bezier(0.22, 1, 0.36, 1);
+                            .s2-btn {
+                                animation: s2SuccessBtn 4.5s infinite cubic-bezier(0.22, 1, 0.36, 1);
                             }
 
-                            .s1-text {
-                                animation: s1SuccessText 4.5s infinite;
+                            .s2-text {
+                                animation: s2SuccessText 4.5s infinite;
                             }
 
-                            .s1-check {
-                                animation: s1Checkmark 4.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            .s2-check {
+                                animation: s2Checkmark 4.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
                                 transform-origin: 70px 148px;
                             }
 
-                            /* ---- Scene 2: Truck Parallax ---- */
-                            @keyframes s2Truck {
+                            /* ---- Scene 3: Truck Parallax ---- */
+                            @keyframes s3Truck {
                                 0% {
                                     transform: translateX(-130%);
                                 }
 
-                                30% {
-                                    transform: translateX(0);
-                                }
-
+                                30%,
                                 70% {
                                     transform: translateX(0);
                                 }
@@ -371,15 +473,12 @@
                                 }
                             }
 
-                            @keyframes s2Wheel {
+                            @keyframes s3Wheel {
                                 0% {
                                     transform: rotate(0deg);
                                 }
 
-                                30% {
-                                    transform: rotate(360deg);
-                                }
-
+                                30%,
                                 70% {
                                     transform: rotate(360deg);
                                 }
@@ -389,7 +488,7 @@
                                 }
                             }
 
-                            @keyframes s2Pin {
+                            @keyframes s3Pin {
 
                                 0%,
                                 100% {
@@ -401,15 +500,12 @@
                                 }
                             }
 
-                            @keyframes s2RoadMove {
+                            @keyframes s3RoadMove {
                                 0% {
                                     background-position: 0 0;
                                 }
 
-                                30% {
-                                    background-position: -80px 0;
-                                }
-
+                                30%,
                                 70% {
                                     background-position: -80px 0;
                                 }
@@ -419,7 +515,7 @@
                                 }
                             }
 
-                            @keyframes s2TrashVanish {
+                            @keyframes s3TrashVanish {
 
                                 0%,
                                 55% {
@@ -434,32 +530,32 @@
                                 }
                             }
 
-                            .s2-truck {
-                                animation: s2Truck 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+                            .s3-truck {
+                                animation: s3Truck 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
                             }
 
-                            .s2-wheel {
-                                animation: s2Wheel 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+                            .s3-wheel {
+                                animation: s3Wheel 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
                                 transform-origin: center;
                             }
 
-                            .s2-pin {
-                                animation: s2Pin 1s ease-in-out infinite;
+                            .s3-pin {
+                                animation: s3Pin 1s ease-in-out infinite;
                             }
 
-                            .s2-road {
-                                background-image: linear-gradient(90deg, transparent 50%, rgba(108, 122, 113, 0.3) 50%);
+                            .s3-road {
+                                background-image: linear-gradient(90deg, transparent 50%, rgba(16, 185, 129, 0.2) 50%);
                                 background-size: 40px 2px;
-                                animation: s2RoadMove 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+                                animation: s3RoadMove 4.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
                             }
 
-                            .s2-trash {
-                                animation: s2TrashVanish 4.5s infinite;
+                            .s3-trash {
+                                animation: s3TrashVanish 4.5s infinite;
                                 transform-origin: center bottom;
                             }
 
-                            /* ---- Scene 3 ---- */
-                            @keyframes s3CoinFall {
+                            /* ---- Scene 4: Terima Koin ---- */
+                            @keyframes s4CoinFall {
                                 0% {
                                     transform: translateY(-70px) rotateY(0deg);
                                     opacity: 0;
@@ -481,7 +577,7 @@
                                 }
                             }
 
-                            @keyframes s3Reward {
+                            @keyframes s4Reward {
 
                                 0%,
                                 60% {
@@ -501,7 +597,7 @@
                                 }
                             }
 
-                            @keyframes s3Sparkle {
+                            @keyframes s4Sparkle {
 
                                 0%,
                                 50% {
@@ -525,127 +621,177 @@
                                 }
                             }
 
-                            .s3-coin-1 {
-                                animation: s3CoinFall 4.5s 0.2s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            .s4-coin-1 {
+                                animation: s4CoinFall 4.5s 0.2s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
                             }
 
-                            .s3-coin-2 {
-                                animation: s3CoinFall 4.5s 0.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            .s4-coin-2 {
+                                animation: s4CoinFall 4.5s 0.5s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
                             }
 
-                            .s3-coin-3 {
-                                animation: s3CoinFall 4.5s 0.8s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
+                            .s4-coin-3 {
+                                animation: s4CoinFall 4.5s 0.8s infinite cubic-bezier(0.34, 1.56, 0.64, 1);
                             }
 
-                            .s3-reward {
-                                animation: s3Reward 4.5s infinite ease-in-out;
+                            .s4-reward {
+                                animation: s4Reward 4.5s infinite ease-in-out;
                             }
 
-                            .s3-sp-1 {
-                                animation: s3Sparkle 4.5s 0.3s infinite;
+                            .s4-sp-1 {
+                                animation: s4Sparkle 4.5s 0.3s infinite;
                             }
 
-                            .s3-sp-2 {
-                                animation: s3Sparkle 4.5s 0.7s infinite;
+                            .s4-sp-2 {
+                                animation: s4Sparkle 4.5s 0.7s infinite;
                             }
 
-                            .s3-sp-3 {
-                                animation: s3Sparkle 4.5s 1.0s infinite;
+                            .s4-sp-3 {
+                                animation: s4Sparkle 4.5s 1.0s infinite;
                             }
 
-                            .s3-sp-4 {
-                                animation: s3Sparkle 4.5s 0.5s infinite;
+                            .s4-sp-4 {
+                                animation: s4Sparkle 4.5s 0.5s infinite;
                             }
                         </style>
 
-                        <!-- ===== SCENE 1: Pesan & Lapor ===== -->
+                        <!-- ===== SCENE 1: Daftar & Atur Alamat ===== -->
                         <div x-show="scene === 1" x-transition:enter="scene-enter" x-transition:leave="scene-leave"
                             class="absolute inset-0 flex flex-col items-center justify-center p-8">
 
-                            <!-- Phone SVG -->
-                            <div class="relative flex items-center justify-center" style="transform:rotate(-8deg);">
-                                <svg width="140" height="230" viewBox="0 0 140 230" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="4" y="4" width="132" height="222" rx="20" stroke="#006c49" stroke-width="3"
-                                        fill="white" />
-                                    <rect x="50" y="12" width="40" height="8" rx="4" fill="#e6eeff" />
-                                    <rect x="14" y="30" width="112" height="22" rx="4" fill="#006c49" />
-                                    <text x="70" y="45" text-anchor="middle" font-family="Inter,sans-serif"
-                                        font-size="9" font-weight="700" fill="white">EcoTrash</text>
-                                    <rect x="20" y="64" width="70" height="7" rx="3" fill="#d9e3f6" />
-                                    <rect x="20" y="78" width="50" height="7" rx="3" fill="#e6eeff" />
+                            <div class="relative w-[180px] h-[220px] flex flex-col items-center justify-center">
+                                <!-- Minimal Map Base -->
+                                <div class="s1-map absolute bottom-10 w-full h-[60px] bg-outline-variant/10 border border-outline-variant/30 rounded-xl shadow-sm"
+                                    style="transform: perspective(400px) rotateX(60deg);">
+                                    <div class="absolute inset-0 flex items-center justify-center gap-4 opacity-50">
+                                        <div class="w-1 h-full bg-outline-variant/20"></div>
+                                        <div class="w-full h-1 bg-outline-variant/20 absolute"></div>
+                                    </div>
+                                </div>
 
-                                    <g>
-                                        <!-- Ripple rings -->
-                                        <circle cx="70" cy="148" r="20" stroke="#006c49" stroke-width="1.5"
-                                            class="s1-ripple-1" fill="none" opacity="0" />
-                                        <circle cx="70" cy="148" r="20" stroke="#006c49" stroke-width="1"
-                                            class="s1-ripple-2" fill="none" opacity="0" />
-                                        <circle cx="70" cy="148" r="20" stroke="#10b981" stroke-width="0.8"
-                                            class="s1-ripple-3" fill="none" opacity="0" />
-                                        <!-- Button -->
-                                        <rect class="s1-btn" x="18" y="134" width="104" height="28" rx="8"
-                                            fill="#006c49" />
-                                        <text class="s1-text" x="70" y="152" text-anchor="middle"
-                                            font-family="Inter,sans-serif" font-size="9" font-weight="600"
-                                            fill="white">Pesan Sekarang</text>
-                                        <!-- Checkmark -->
-                                        <path class="s1-check" d="M63 148 L68 153 L77 143" stroke="white"
-                                            stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"
-                                            opacity="0" />
-                                    </g>
-                                    <rect x="55" y="210" width="30" height="4" rx="2" fill="#bbcabf" />
-                                </svg>
+                                <!-- Profile Card -->
+                                <div
+                                    class="s1-card absolute top-4 w-[120px] bg-white rounded-2xl shadow-md border border-outline-variant/50 p-3 flex flex-col items-center">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#006c49"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="w-16 h-2 bg-outline-variant/30 rounded-full mb-1.5"></div>
+                                    <div class="w-10 h-1.5 bg-outline-variant/20 rounded-full"></div>
+                                </div>
 
-                                <!-- macOS Cursor SVG -->
-                                <div class="absolute s1-cursor" style="bottom: 50px; left: 80px; z-index: 20;">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                <!-- Map Pin -->
+                                <div class="s1-pin absolute bottom-12 flex flex-col items-center">
+                                    <svg width="28" height="36" viewBox="0 0 24 32" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5.5 3L18.5 10L12 12.5L14.5 19L11.5 20L9 13.5L4 16.5V3Z" fill="black"
-                                            stroke="white" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path
+                                            d="M12 0C5.372 0 0 5.373 0 12c0 9 12 20 12 20s12-11 12-20c0-6.627-5.372-12-12-12z"
+                                            fill="#006c49" />
+                                        <circle cx="12" cy="12" r="5" fill="white" />
+                                    </svg>
+                                    <div class="w-4 h-1 bg-black/20 blur-[2px] rounded-full mt-1"></div>
+                                </div>
+
+                                <!-- Success Check -->
+                                <div
+                                    class="s1-check absolute right-10 bottom-24 bg-[#10b981] w-6 h-6 rounded-full flex items-center justify-center shadow-md">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white"
+                                        stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ===== SCENE 2: Petugas Bergerak ===== -->
+                        <!-- ===== SCENE 2: Pesan & Lapor ===== -->
                         <div x-show="scene === 2" x-transition:enter="scene-enter" x-transition:leave="scene-leave"
+                            class="absolute inset-0 flex flex-col items-center justify-center p-8">
+
+                            <!-- Refined Phone SVG -->
+                            <div class="relative flex items-center justify-center" style="transform:rotate(-8deg);">
+                                <!-- Soft shadow behind phone -->
+                                <div class="absolute inset-0 bg-black/5 blur-xl rounded-[20px] translate-y-4"></div>
+                                <svg width="140" height="230" viewBox="0 0 140 230" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" class="relative z-10 drop-shadow-sm">
+                                    <rect x="2" y="2" width="136" height="226" rx="20" stroke="#10b981"
+                                        stroke-width="1.5" fill="white" />
+                                    <!-- Speaker -->
+                                    <rect x="50" y="12" width="40" height="6" rx="3" fill="#ecfdf5" />
+                                    <!-- Header -->
+                                    <rect x="14" y="30" width="112" height="22" rx="6" fill="#ecfdf5" />
+                                    <text x="70" y="45" text-anchor="middle" font-family="Inter,sans-serif"
+                                        font-size="9" font-weight="700" fill="#10b981">EcoTrash</text>
+                                    <!-- Content Lines -->
+                                    <rect x="20" y="64" width="70" height="6" rx="3" fill="#d1fae5" />
+                                    <rect x="20" y="78" width="50" height="6" rx="3" fill="#ecfdf5" />
+
+                                    <g>
+                                        <!-- Ripple rings -->
+                                        <circle cx="70" cy="148" r="20" stroke="#10b981" stroke-width="1.5"
+                                            class="s2-ripple-1" fill="none" opacity="0" />
+                                        <circle cx="70" cy="148" r="20" stroke="#10b981" stroke-width="1"
+                                            class="s2-ripple-2" fill="none" opacity="0" />
+                                        <circle cx="70" cy="148" r="20" stroke="#059669" stroke-width="0.8"
+                                            class="s2-ripple-3" fill="none" opacity="0" />
+                                        <!-- Button -->
+                                        <rect class="s2-btn" x="18" y="134" width="104" height="28" rx="14"
+                                            fill="#10b981" />
+                                        <text class="s2-text" x="70" y="152" text-anchor="middle"
+                                            font-family="Inter,sans-serif" font-size="9" font-weight="600"
+                                            fill="white">Pesan Sekarang</text>
+                                        <!-- Checkmark -->
+                                        <path class="s2-check" d="M63 148 L68 153 L77 143" stroke="white"
+                                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                            fill="none" opacity="0" />
+                                    </g>
+                                    <!-- Home indicator -->
+                                    <rect x="55" y="214" width="30" height="3" rx="1.5" fill="#a7f3d0" />
+                                </svg>
+
+                                <!-- Custom Hand Asset Cursor -->
+                                <div class="absolute s2-cursor" style="bottom: 10px; left: 85px; z-index: 20;">
+                                    <img src="{{ asset('assets/hand.svg') }}" class="w-16 h-auto drop-shadow-md"
+                                        alt="cursor">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== SCENE 3: Petugas Bergerak ===== -->
+                        <div x-show="scene === 3" x-transition:enter="scene-enter" x-transition:leave="scene-leave"
                             class="absolute inset-0 flex flex-col items-center justify-center px-8">
 
                             <div class="relative w-full flex flex-col items-center justify-end" style="height:220px;">
+
                                 <!-- Parallax Road -->
-                                <div class="absolute bottom-8 left-0 right-0 h-[2px] bg-outline-variant/30"></div>
-                                <div class="s2-road absolute bottom-8 left-0 right-0 h-[2px]"></div>
+                                <div class="absolute bottom-[42px] left-0 right-0 h-[2px] bg-[#10b981]/20"></div>
+                                <div class="s3-road absolute bottom-[42px] left-0 right-0 h-[2px]"></div>
 
                                 <!-- Modern Minimalist House -->
-                                <div class="absolute right-20 bottom-10 flex gap-2 items-end">
+                                <div class="absolute center-x bottom-12 flex gap-2 items-end z-10 drop-shadow-sm">
                                     <!-- Trash Bin -->
-                                    <div class="s2-trash relative mb-0.5">
-                                        <svg width="21" height="28" viewBox="0 0 12 16" fill="none" stroke="#6c7a71"
+                                    <div class="s3-trash relative mb-0.5">
+                                        <svg width="21" height="28" viewBox="0 0 12 16" fill="none" stroke="#10b981"
                                             stroke-width="1.2" stroke-linejoin="round">
                                             <path d="M2 3h8v12H2zM1 3h10M4 1v2M8 1v2" />
                                         </svg>
                                     </div>
-                                    <!-- House -->
-                                    <svg width="90" height="90" viewBox="0 0 24 24" fill="none" stroke="#006c49"
-                                        stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M3 10L12 3l9 7" stroke-width="1" /> <!-- Roof -->
-                                        <path d="M5 10v11h14V10" /> <!-- Body -->
-                                        <rect x="9" y="14" width="6" height="7" /> <!-- Door -->
-                                        <rect x="16" y="12" width="2" height="4" /> <!-- Window -->
-                                        <rect x="6" y="12" width="2" height="4" /> Window
-                                    </svg>
+                                    <!-- Custom House Asset -->
+                                    <img src="{{ asset('assets/House.svg') }}" class="w-[200px] h-auto pb-1"
+                                        alt="House">
                                 </div>
 
                                 <!-- Compactor Truck -->
-                                <div class="s2-truck absolute bottom-[38px]" style="width:180px;">
+                                <div class="s3-truck absolute bottom-[38px] z-20 drop-shadow-sm" style="width:180px;">
                                     <!-- Location pin -->
-                                    <div class="s2-pin absolute -top-12 left-1/2 -translate-x-1/2">
+                                    <div class="s3-pin absolute -top-12 left-1/2 -translate-x-1/2">
                                         <svg width="20" height="26" viewBox="0 0 20 26" fill="none">
-                                            <circle cx="10" cy="10" r="9" fill="#006c49" stroke="white"
+                                            <circle cx="10" cy="10" r="9" fill="#10b981" stroke="white"
                                                 stroke-width="2" />
                                             <circle cx="10" cy="10" r="4" fill="white" />
-                                            <path d="M10 19 L10 26" stroke="#006c49" stroke-width="2"
+                                            <path d="M10 19 L10 26" stroke="#10b981" stroke-width="2"
                                                 stroke-linecap="round" />
                                         </svg>
                                     </div>
@@ -653,111 +799,114 @@
                                     <svg width="180" height="90" viewBox="0 0 180 90" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <!-- Compactor Body -->
-                                        <path d="M10 20 L95 20 L95 70 L10 70 Z" fill="#eff4ff" stroke="#006c49"
-                                            stroke-width="2.5" stroke-linejoin="round" />
+                                        <path d="M10 20 L95 20 L95 70 L10 70 Z" fill="#ecfdf5" stroke="#10b981"
+                                            stroke-width="1.5" stroke-linejoin="round" />
                                         <path d="M20 20 L30 70 M40 20 L50 70 M60 20 L70 70 M80 20 L90 70"
-                                            stroke="#006c49" stroke-width="1.5" stroke-opacity="0.2" />
+                                            stroke="#10b981" stroke-width="1" stroke-opacity="0.2" />
                                         <!-- Cab -->
-                                        <path d="M95 35 Q110 35 125 40 L135 70 L95 70 Z" fill="#eff4ff" stroke="#006c49"
-                                            stroke-width="2.5" stroke-linejoin="round" />
+                                        <path d="M95 35 Q110 35 125 40 L135 70 L95 70 Z" fill="#ecfdf5" stroke="#10b981"
+                                            stroke-width="1.5" stroke-linejoin="round" />
                                         <!-- Windshield -->
-                                        <path d="M100 40 Q110 40 120 44 L125 55 L100 55 Z" fill="#e6eeff"
-                                            stroke="#006c49" stroke-width="1.5" stroke-linejoin="round" />
+                                        <path d="M100 40 Q110 40 120 44 L125 55 L100 55 Z" fill="#d1fae5"
+                                            stroke="#10b981" stroke-width="1.5" stroke-linejoin="round" />
                                         <!-- Details -->
-                                        <rect x="85" y="25" width="5" height="45" fill="#006c49" />
-                                        <rect x="138" y="60" width="10" height="6" rx="2" fill="none" stroke="#006c49"
+                                        <rect x="85" y="25" width="5" height="45" fill="#10b981" />
+                                        <rect x="138" y="60" width="10" height="6" rx="2" fill="none" stroke="#10b981"
                                             stroke-width="1.5" />
                                         <!-- Wheels -->
-                                        <g style="transform-origin:35px 70px;" class="s2-wheel">
-                                            <circle cx="35" cy="70" r="14" stroke="#006c49" stroke-width="2.5"
+                                        <g style="transform-origin:35px 70px;" class="s3-wheel">
+                                            <circle cx="35" cy="70" r="14" stroke="#10b981" stroke-width="2"
                                                 fill="white" />
-                                            <circle cx="35" cy="70" r="5" stroke="#006c49" stroke-width="1.5"
+                                            <circle cx="35" cy="70" r="5" stroke="#10b981" stroke-width="1.5"
                                                 fill="none" />
-                                            <circle cx="35" cy="70" r="2" fill="#006c49" />
+                                            <circle cx="35" cy="70" r="2" fill="#10b981" />
                                         </g>
-                                        <g style="transform-origin:70px 70px;" class="s2-wheel">
-                                            <circle cx="70" cy="70" r="14" stroke="#006c49" stroke-width="2.5"
+                                        <g style="transform-origin:70px 70px;" class="s3-wheel">
+                                            <circle cx="70" cy="70" r="14" stroke="#10b981" stroke-width="2"
                                                 fill="white" />
-                                            <circle cx="70" cy="70" r="5" stroke="#006c49" stroke-width="1.5"
+                                            <circle cx="70" cy="70" r="5" stroke="#10b981" stroke-width="1.5"
                                                 fill="none" />
-                                            <circle cx="70" cy="70" r="2" fill="#006c49" />
+                                            <circle cx="70" cy="70" r="2" fill="#10b981" />
                                         </g>
-                                        <g style="transform-origin:115px 70px;" class="s2-wheel">
-                                            <circle cx="115" cy="70" r="14" stroke="#006c49" stroke-width="2.5"
+                                        <g style="transform-origin:115px 70px;" class="s3-wheel">
+                                            <circle cx="115" cy="70" r="14" stroke="#10b981" stroke-width="2"
                                                 fill="white" />
-                                            <circle cx="115" cy="70" r="5" stroke="#006c49" stroke-width="1.5"
+                                            <circle cx="115" cy="70" r="5" stroke="#10b981" stroke-width="1.5"
                                                 fill="none" />
-                                            <circle cx="115" cy="70" r="2" fill="#006c49" />
+                                            <circle cx="115" cy="70" r="2" fill="#10b981" />
                                         </g>
                                     </svg>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ===== SCENE 3: Terima Koin ===== -->
-                        <div x-show="scene === 3" x-transition:enter="scene-enter" x-transition:leave="scene-leave"
+                        <!-- ===== SCENE 4: Terima Koin ===== -->
+                        <div x-show="scene === 4" x-transition:enter="scene-enter" x-transition:leave="scene-leave"
                             class="absolute inset-0 flex flex-col items-center justify-center p-8">
 
                             <div class="relative flex items-center justify-center" style="height:260px;width:200px;">
                                 <!-- Sparkles -->
-                                <div class="s3-sp-1 absolute" style="top:20px;left:10px;"><svg width="12" height="12"
+                                <div class="s4-sp-1 absolute" style="top:20px;left:10px;"><svg width="12" height="12"
                                         viewBox="0 0 12 12">
                                         <path d="M6 0l1 5 5 1-5 1-1 5-1-5-5-1 5-1z" fill="#F59E0B" />
                                     </svg></div>
-                                <div class="s3-sp-2 absolute" style="top:15px;right:15px;"><svg width="10" height="10"
+                                <div class="s4-sp-2 absolute" style="top:15px;right:15px;"><svg width="10" height="10"
                                         viewBox="0 0 12 12">
                                         <path d="M6 0l1 5 5 1-5 1-1 5-1-5-5-1 5-1z" fill="#F59E0B" />
                                     </svg></div>
-                                <div class="s3-sp-3 absolute" style="bottom:50px;left:5px;"><svg width="8" height="8"
+                                <div class="s4-sp-3 absolute" style="bottom:50px;left:5px;"><svg width="8" height="8"
                                         viewBox="0 0 12 12">
                                         <path d="M6 0l1 5 5 1-5 1-1 5-1-5-5-1 5-1z" fill="#F59E0B" />
                                     </svg></div>
-                                <div class="s3-sp-4 absolute" style="bottom:55px;right:10px;"><svg width="10"
+                                <div class="s4-sp-4 absolute" style="bottom:55px;right:10px;"><svg width="10"
                                         height="10" viewBox="0 0 12 12">
                                         <path d="M6 0l1 5 5 1-5 1-1 5-1-5-5-1 5-1z" fill="#F59E0B" />
                                     </svg></div>
 
                                 <!-- Floating reward label -->
-                                <div class="s3-reward absolute top-2 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                                <div class="s4-reward absolute top-2 left-1/2 -translate-x-1/2 whitespace-nowrap z-30">
                                     <span class="text-[11px] font-bold px-3 py-1 rounded-full border shadow-sm"
                                         style="background:#fff7ed;color:#d97706;border-color:#fde68a;">+10 Poin
                                         Reward</span>
                                 </div>
 
                                 <!-- Coins falling -->
-                                <div class="s3-coin-1 absolute" style="top:30px;left:30px;">
-                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[11px] text-white border-2 border-white shadow-md"
+                                <div class="s4-coin-1 absolute z-20" style="top:30px;left:30px;">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[11px] text-white border-2 border-white shadow-md drop-shadow-sm"
                                         style="background: linear-gradient(135deg, #FCD34D, #F59E0B);">Rp</div>
                                 </div>
-                                <div class="s3-coin-2 absolute" style="top:20px;left:1/2;margin-left:-18px;">
-                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[11px] text-white border-2 border-white shadow-md"
+                                <div class="s4-coin-2 absolute z-20" style="top:20px;left:1/2;margin-left:-18px;">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[11px] text-white border-2 border-white shadow-md drop-shadow-sm"
                                         style="background: linear-gradient(135deg, #FCD34D, #F59E0B);">Rp</div>
                                 </div>
-                                <div class="s3-coin-3 absolute" style="top:30px;right:30px;">
-                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[11px] text-white border-2 border-white shadow-md"
+                                <div class="s4-coin-3 absolute z-20" style="top:30px;right:30px;">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-[11px] text-white border-2 border-white shadow-md drop-shadow-sm"
                                         style="background: linear-gradient(135deg, #FCD34D, #F59E0B);">Rp</div>
                                 </div>
 
-                                <!-- Phone / Wallet -->
+                                <!-- Refined Wallet Phone -->
                                 <div class="absolute bottom-0 left-1/2 -translate-x-1/2">
+                                    <!-- Soft shadow behind phone -->
+                                    <div class="absolute inset-0 bg-black/5 blur-xl rounded-[20px] translate-y-4"></div>
                                     <svg width="130" height="170" viewBox="0 0 130 170" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="3" y="3" width="124" height="164" rx="18" stroke="#006c49"
-                                            stroke-width="2.5" fill="white" />
-                                        <rect x="45" y="10" width="40" height="7" rx="3" fill="#e6eeff" />
+                                        xmlns="http://www.w3.org/2000/svg" class="relative z-10 drop-shadow-sm">
+                                        <rect x="2" y="2" width="126" height="166" rx="18" stroke="#10b981"
+                                            stroke-width="1.5" fill="white" />
+                                        <rect x="45" y="10" width="40" height="6" rx="3" fill="#ecfdf5" />
                                         <text x="65" y="52" text-anchor="middle" font-family="Inter,sans-serif"
-                                            font-size="9" fill="#6c7a71" font-weight="500">Saldo Koin</text>
+                                            font-size="9" fill="#10b981" font-weight="600">Saldo Koin</text>
 
                                         <!-- Dynamic Counter Fake with Alpine -->
                                         <text x="65" y="80" text-anchor="middle" font-family="Inter,sans-serif"
-                                            font-size="28" font-weight="700" fill="#121c2a"
-                                            x-text="animatingBalance ? '240' : '250'">1,250</text>
+                                            font-size="28" font-weight="700" fill="#064e3b"
+                                            x-text="animatingBalance ? '240' : '250'">1,240</text>
 
-                                        <rect x="28" y="94" width="74" height="20" rx="10" fill="#006c49" />
+                                        <rect x="28" y="94" width="74" height="22" rx="11" fill="#ecfdf5"
+                                            stroke="#10b981" stroke-width="1" />
                                         <text x="65" y="108" text-anchor="middle" font-family="Inter,sans-serif"
-                                            font-size="9" font-weight="600" fill="white">+10 Koin</text>
-                                        <rect x="20" y="122" width="90" height="1.5" rx="1" fill="#e6eeff" />
-                                        <rect x="45" y="148" width="40" height="5" rx="2" fill="#d9e3f6" />
+                                            font-size="9" font-weight="600" fill="#10b981">+10 Koin</text>
+                                        <rect x="20" y="128" width="90" height="1.5" rx="1" fill="#d1fae5" />
+                                        <rect x="45" y="152" width="40" height="4" rx="2" fill="#a7f3d0" />
                                     </svg>
                                 </div>
                             </div>
@@ -769,24 +918,26 @@
                                 class="h-2 rounded-full transition-all duration-300"></button>
                             <button @click="scene=2" :class="scene===2 ? 'bg-primary w-5' : 'bg-outline-variant w-2'"
                                 class="h-2 rounded-full transition-all duration-300"></button>
-                            <button @click="scene=3" :class="scene===3 ? 'w-5' : 'bg-outline-variant w-2'"
-                                :style="scene===3 ? 'background:#F59E0B' : ''"
+                            <button @click="scene=3" :class="scene===3 ? 'bg-primary w-5' : 'bg-outline-variant w-2'"
+                                class="h-2 rounded-full transition-all duration-300"></button>
+                            <button @click="scene=4" :class="scene===4 ? 'w-5' : 'bg-outline-variant w-2'"
+                                :style="scene===4 ? 'background:#F59E0B' : ''"
                                 class="h-2 rounded-full transition-all duration-300"></button>
                         </div>
 
                     </div>
-
                     <!-- Steps Column -->
                     <div class="flex flex-col gap-8 text-left w-full lg:pl-10 relative">
                         <div class="absolute left-[1.4rem] top-12 bottom-8 w-[2px] bg-outline-variant/30 -z-0"></div>
 
                         <div class="flex items-start gap-6 relative group/step cursor-default">
-                            <div
-                                class="w-12 h-12 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm text-lg relative z-10 transition-all bg-surface-container-highest text-on-surface border border-outline-variant">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold shrink-0 shadow-sm text-lg relative z-10 transition-all border"
+                                :class="scene === 1 ? 'bg-primary text-white ring-4 ring-primary/30 border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'">
                                 1</div>
-                            <div
-                                class="relative z-10 bg-surface/50 p-4 rounded-xl border border-transparent transition-all">
-                                <h4 class="text-on-surface font-bold text-xl mb-2">Daftar &amp; Atur Alamat</h4>
+                            <div class="relative z-10 p-4 rounded-xl transition-all border"
+                                :class="scene === 1 ? 'bg-surface shadow-md border-primary/20 scale-[1.02]' : 'bg-surface/50 border-transparent'">
+                                <h4 class="text-on-surface font-bold text-xl mb-2"
+                                    :class="scene === 1 ? 'text-primary' : ''">Daftar &amp; Atur Alamat</h4>
                                 <p class="text-on-surface-variant text-base">Buat akun dengan mudah dan masukkan detail
                                     alamat rumah Anda di dalam komplek.</p>
                             </div>
@@ -794,12 +945,12 @@
 
                         <div class="flex items-start gap-6 relative group/step cursor-default">
                             <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold shrink-0 text-lg relative z-10 transition-all shadow-md border"
-                                :class="scene === 1 ? 'bg-primary text-white ring-4 ring-primary/30 border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'">
+                                :class="scene === 2 ? 'bg-primary text-white ring-4 ring-primary/30 border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'">
                                 2</div>
                             <div class="relative z-10 p-4 rounded-xl transition-all border"
-                                :class="scene === 1 ? 'bg-surface shadow-md border-primary/20 scale-[1.02]' : 'bg-surface/50 border-transparent'">
+                                :class="scene === 2 ? 'bg-surface shadow-md border-primary/20 scale-[1.02]' : 'bg-surface/50 border-transparent'">
                                 <h4 class="text-on-surface font-bold text-xl mb-2"
-                                    :class="scene === 1 ? 'text-primary' : ''">Pesan atau Lapor</h4>
+                                    :class="scene === 2 ? 'text-primary' : ''">Pesan atau Lapor</h4>
                                 <p class="text-on-surface-variant text-base">Pilih jadwal rutin penjemputan atau
                                     laporkan tumpukan sampah insidental melalui aplikasi.</p>
                             </div>
@@ -807,12 +958,12 @@
 
                         <div class="flex items-start gap-6 relative group/step cursor-default">
                             <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold shrink-0 text-lg relative z-10 transition-all shadow-md border"
-                                :class="scene === 2 ? 'bg-primary text-white ring-4 ring-primary/30 border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'">
+                                :class="scene === 3 ? 'bg-primary text-white ring-4 ring-primary/30 border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'">
                                 3</div>
                             <div class="relative z-10 p-4 rounded-xl transition-all border"
-                                :class="scene === 2 ? 'bg-surface shadow-md border-primary/20 scale-[1.02]' : 'bg-surface/50 border-transparent'">
+                                :class="scene === 3 ? 'bg-surface shadow-md border-primary/20 scale-[1.02]' : 'bg-surface/50 border-transparent'">
                                 <h4 class="text-on-surface font-bold text-xl mb-2"
-                                    :class="scene === 2 ? 'text-primary' : ''">Petugas Bergerak</h4>
+                                    :class="scene === 3 ? 'text-primary' : ''">Petugas Bergerak</h4>
                                 <p class="text-on-surface-variant text-base">Tim kami yang profesional akan datang tepat
                                     waktu sesuai jadwal dan lokasi laporan.</p>
                             </div>
@@ -820,14 +971,14 @@
 
                         <div class="flex items-start gap-6 relative group/step cursor-default">
                             <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold shrink-0 text-lg relative z-10 transition-all shadow-md border"
-                                :class="scene === 3 ? 'text-white border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'"
-                                :style="scene === 3 ? 'background:#F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.5)' : ''">
+                                :class="scene === 4 ? 'text-white border-transparent scale-110' : 'bg-surface-container-highest text-on-surface border-outline-variant'"
+                                :style="scene === 4 ? 'background:#F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.5)' : ''">
                                 4</div>
                             <div class="relative z-10 p-4 rounded-xl transition-all border"
-                                :class="scene === 3 ? 'bg-surface shadow-md scale-[1.02]' : 'bg-surface/50 border-transparent'"
-                                :style="scene === 3 ? 'border-color: rgba(245,158,11,0.3)' : ''">
+                                :class="scene === 4 ? 'bg-surface shadow-md scale-[1.02]' : 'bg-surface/50 border-transparent'"
+                                :style="scene === 4 ? 'border-color: rgba(245,158,11,0.3)' : ''">
                                 <h4 class="text-on-surface font-bold text-xl mb-2"
-                                    :style="scene === 3 ? 'color:#d97706' : ''">Terima Koin</h4>
+                                    :style="scene === 4 ? 'color:#d97706' : ''">Terima Koin</h4>
                                 <p class="text-on-surface-variant text-base">Sistem otomatis mencatat partisipasi Anda
                                     dan koin reward akan langsung masuk ke dompet digital Anda.</p>
                             </div>
@@ -838,11 +989,15 @@
         <!-- Pre-Footer CTA -->
         <section id="cta" class="py-50 px-10 bg-surface">
             <!-- Background Orbs -->
+            <div
+                class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none">
+            </div>
 
             <div class="max-w-[800px] mx-auto text-center relative z-10 flex flex-col items-center">
                 <div
                     class="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 border border-primary/20">
-                    <span class="material-symbols-outlined text-[40px] text-primary">compost</span>
+                    <span class="material-symbols-outlined text-[40px] text-primary"
+                        style="font-variation-settings: 'FILL' 1;">eco</span>
                 </div>
                 <h2 class="text-on-surface text-[32px] md:text-[40px] font-bold leading-tight mb-6">
                     Siap Mewujudkan Komplek Perumahan yang Lebih Bersih?
