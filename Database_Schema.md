@@ -138,7 +138,9 @@ Tabel untuk penanganan sampah ilegal.
 - `alamat_lokasi` (String, Nullable) -> _Teks alamat hasil konversi Reverse Geocoding_
 - `deskripsi` (Text)
 - `foto_laporan_warga` (String/URL)
-- `status` (Enum: 'menunggu', 'disetujui', 'ditolak', 'sedang_dibersihkan', 'selesai')
+- `status` (Enum: 'menunggu', 'disetujui', 'ditolak', 'sedang_dibersihkan', 'selesai', 'ditunda')
+- `alasan_penolakan` (Text, Nullable) -> _Catatan alasan jika laporan ditolak oleh admin_
+- `alasan_ditunda` (Text, Nullable) -> _Catatan jika petugas menunda pembersihan (cth: alat kurang)_
 - `koin_reward` (Integer, Default: 0) -> _Koin yang diberikan admin jika disetujui_
 - `petugas_id` (Foreign Key -> `users.id`, Nullable) -> _Petugas yang menangani_
 - `foto_bukti_selesai_petugas` (String/URL, Nullable)
@@ -166,15 +168,26 @@ Tabel untuk menyimpan notifikasi persisten yang muncul di panel bel/lonceng Warg
 
 - `id` (Primary Key, BigInt)
 - `user_id` (Foreign Key -> `users.id`)
-- `reference_id` (BigInt, Nullable) -> _ID entitas terkait (misal ID pesanan atau laporan)_
-- `reference_type` (String, Nullable) -> _Tipe referensi (misal: 'pesanan', 'laporan')_
 - `judul` (String)
 - `pesan` (Text)
-- `tipe` (Enum: 'info', 'warning', 'success', 'error')
+- `tipe` (Enum: 'info', 'warning', 'success', 'error', Default: 'info') -> _Untuk styling UI (warna icon)_
 - `is_read` (Boolean, Default: false)
-- `created_at` (Timestamp)
+- `created_at`, `updated_at` (Timestamp)
 
-### 10. `riwayat_status_pesanan`
+### 10. `riwayat_koin`
+
+Tabel log transaksi koin untuk keperluan Cron Job Expired 6 bulan dan history koin warga.
+
+- `id` (Primary Key, BigInt)
+- `warga_id` (Foreign Key -> `users.id`)
+- `tipe_transaksi` (Enum: 'masuk', 'keluar', 'expired')
+- `jumlah` (Integer) -> _Nominal koin_
+- `sumber` (Enum: 'pesanan', 'laporan_liar', 'penukaran', 'sistem')
+- `referensi_id` (String/BigInt, Nullable) -> _ID Pesanan atau ID Laporan terkait_
+- `expired_at` (Timestamp, Nullable) -> _Waktu kapan koin ini hangus (biasanya +6 bulan sejak didapat)_
+- `created_at`, `updated_at` (Timestamp)
+
+### 11. `riwayat_status_pesanan`
 
 Tabel untuk merekam audit trail atau rekam jejak status pesanan pengangkutan, digunakan untuk fitur modal pelacakan/tracking waktu real-time.
 
