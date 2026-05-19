@@ -21,14 +21,15 @@
 
 <body class="bg-background text-on-background font-body-md antialiased selection:bg-primary/20 selection:text-primary">
     <!-- Sticky Header -->
-    <header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant transition-all" x-data="{ mobileMenuOpen: false }">
+    <header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant transition-all"
+        x-data="{ mobileMenuOpen: false }">
         <div class="max-w-[1280px] mx-auto px-6 md:px-10 flex items-center justify-between h-[72px]">
             <div class="flex items-center gap-3 text-primary">
                 <span class="material-symbols-outlined text-[28px]"
                     style="font-variation-settings: 'FILL' 1;">eco</span>
                 <h2 class="text-on-surface font-title-sm font-bold tracking-tight">EcoTrash</h2>
             </div>
-            
+
             <!-- Desktop Nav -->
             <nav class="hidden md:flex items-center gap-8">
                 <a class="text-on-surface-variant hover:text-primary text-sm font-medium transition-colors"
@@ -50,21 +51,31 @@
             </div>
 
             <!-- Mobile Menu Toggle -->
-            <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-on-surface hover:bg-surface-variant rounded-lg transition-colors">
-                <span class="material-symbols-outlined text-[28px]" x-text="mobileMenuOpen ? 'close' : 'menu'">menu</span>
+            <button @click="mobileMenuOpen = !mobileMenuOpen"
+                class="md:hidden p-2 text-on-surface hover:bg-surface-variant rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-[28px]"
+                    x-text="mobileMenuOpen ? 'close' : 'menu'">menu</span>
             </button>
         </div>
 
         <!-- Mobile Dropdown -->
-        <div x-show="mobileMenuOpen" x-transition x-cloak class="md:hidden absolute top-[72px] left-0 w-full bg-white border-b border-outline-variant shadow-lg py-4 px-6 flex flex-col gap-4">
-            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#">Beranda</a>
-            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#fitur">Fitur</a>
-            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#cara-kerja">Cara Kerja</a>
-            <a @click="mobileMenuOpen = false" class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#kontak">Kontak</a>
+        <div x-show="mobileMenuOpen" x-transition x-cloak
+            class="md:hidden absolute top-[72px] left-0 w-full bg-white border-b border-outline-variant shadow-lg py-4 px-6 flex flex-col gap-4">
+            <a @click="mobileMenuOpen = false"
+                class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#">Beranda</a>
+            <a @click="mobileMenuOpen = false"
+                class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#fitur">Fitur</a>
+            <a @click="mobileMenuOpen = false"
+                class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#cara-kerja">Cara
+                Kerja</a>
+            <a @click="mobileMenuOpen = false"
+                class="text-on-surface hover:text-primary font-medium transition-colors py-2" href="#kontak">Kontak</a>
             <hr class="border-outline-variant/50">
             <div class="flex flex-col gap-3 pt-2">
-                <a href="/login" class="text-primary font-bold text-center border border-primary rounded-lg py-3">Masuk</a>
-                <a href="/register" class="bg-primary text-white font-bold text-center rounded-lg py-3 shadow-md">Daftar Akun</a>
+                <a href="/login"
+                    class="text-primary font-bold text-center border border-primary rounded-lg py-3">Masuk</a>
+                <a href="/register" class="bg-primary text-white font-bold text-center rounded-lg py-3 shadow-md">Daftar
+                    Akun</a>
             </div>
         </div>
     </header>
@@ -74,7 +85,7 @@
         <section class="relative pt-6 pb-20 md:pt-12 md:pb-24 px-6 md:px-10 overflow-hidden">
             <div class="max-w-[1280px] mx-auto">
                 <div class="rounded-[24px] overflow-hidden relative min-h-[480px] md:min-h-[560px] flex items-center"
-                    style="background-image: linear-gradient(to right, rgba(18, 28, 42, 0.9) 0%, rgba(18, 28, 42, 0.4) 100%), url('http://127.0.0.1:8000/images/Landingpage_Title.png'); background-size: cover; background-position: center;">
+                    style="background-image: linear-gradient(to right, rgba(18, 28, 42, 0.9) 0%, rgba(18, 28, 42, 0.4) 100%), url('images/Landingpage_Title.png'); background-size: cover; background-position: center;">
                     <div class="relative z-10 max-w-[640px] px-6 md:px-16 py-10 md:py-12 flex flex-col gap-6">
                         <span
                             class="inline-flex items-center self-start gap-1.5 px-3 py-1 rounded-full bg-primary/20 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-primary/30">
@@ -1009,9 +1020,13 @@
         <!-- Pre-Footer CTA -->
         <section id="cta" class="py-20 md:py-32 px-6 md:px-10 bg-surface relative">
             <!-- Background Glow Left -->
-            <div class="absolute top-1/2 left-0 transform -translate-y-1/2 w-[150px] h-[300px] bg-primary/20 blur-[80px] pointer-events-none rounded-r-full"></div>
+            <div
+                class="absolute top-1/2 left-0 transform -translate-y-1/2 w-[150px] h-[300px] bg-primary/20 blur-[80px] pointer-events-none rounded-r-full">
+            </div>
             <!-- Background Glow Right -->
-            <div class="absolute top-1/2 right-0 transform -translate-y-1/2 w-[150px] h-[300px] bg-primary/20 blur-[80px] pointer-events-none rounded-l-full"></div>
+            <div
+                class="absolute top-1/2 right-0 transform -translate-y-1/2 w-[150px] h-[300px] bg-primary/20 blur-[80px] pointer-events-none rounded-l-full">
+            </div>
 
             <div class="max-w-[800px] mx-auto text-center relative z-10 flex flex-col items-center">
                 <div
