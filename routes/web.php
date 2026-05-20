@@ -1,40 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
+// Landing page
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+// --- Guest Auth Routes ---
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.post');
+});
 
-Route::post('/login', function () {
-    // Auth logic will be wired here
-    return back()->withErrors(['email' => 'Fitur login belum dikonfigurasi.']);
-})->name('login.post');
+// --- Authenticated Routes ---
+Route::middleware('auth')->group(function () {
+    Route::get('/setup-address', [RegisteredUserController::class, 'showSetupAddress'])->name('setup-address');
+    Route::post('/setup-address', [RegisteredUserController::class, 'storeAddress'])->name('setup-address.post');
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
 
-Route::get('/register', function () {
-    return view('auth.register');
-})->name('register');
-
-Route::post('/register', function () {
-    // Registration logic will be wired here
-    return redirect()->route('setup-address');
-})->name('register.post');
-
-Route::get('/setup-address', function () {
-    return view('auth.setup-address');
-})->name('setup-address');
-
-Route::post('/setup-address', function () {
-    // Address setup logic will be wired here
-    return redirect()->route('home');
-})->name('setup-address.post');
-
-// --- Warga Routes (Mockups) ---
-Route::prefix('warga')->name('warga.')->group(function () {
+// --- Warga Routes ---
+Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'address.setup'])->group(function () {
     Route::get('/dashboard', function () {
         return view('warga.dashboard');
     })->name('dashboard');
@@ -58,12 +49,12 @@ Route::prefix('warga')->name('warga.')->group(function () {
     Route::get('/profil', function () {
         return view('warga.profil.index');
     })->name('profil.index');
-    
+
     // Pesan
     Route::get('/pesan/create', function () {
         return view('warga.pesan.create');
     })->name('pesan.create');
-    
+
     Route::get('/pesan/berhasil', function () {
         return view('warga.pesan.berhasil');
     })->name('pesan.berhasil');
@@ -86,8 +77,8 @@ Route::get('/home', function () {
     return redirect()->route('warga.dashboard');
 })->name('home');
 
-// --- Admin Routes (Mockups) ---
-Route::prefix('admin')->name('admin.')->group(function () {
+// --- Admin Routes ---
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
@@ -125,8 +116,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('notifikasi.index');
 });
 
-// --- Petugas Routes (Mockups) ---
-Route::prefix('petugas')->name('petugas.')->group(function () {
+// --- Petugas Routes ---
+Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])->group(function () {
     Route::get('/beranda', function () {
         return view('petugas.beranda');
     })->name('beranda');

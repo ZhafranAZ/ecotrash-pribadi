@@ -34,40 +34,70 @@
             <p class="text-on-surface-variant text-sm px-4">Bantu kami mengetahui lokasi rumah Anda untuk penjemputan sampah yang akurat.</p>
         </div>
 
+        <!-- Global Error Messages -->
+        @if ($errors->any())
+            <div class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200">
+                <ul class="list-disc list-inside text-red-600 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Warning if redirected -->
+        @if (session('warning'))
+            <div class="mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200">
+                <div class="flex items-center gap-2 text-amber-700 text-sm font-medium">
+                    <span class="material-symbols-outlined text-[18px]">warning</span>
+                    {{ session('warning') }}
+                </div>
+            </div>
+        @endif
+
         <!-- Address Setup Card -->
         <div class="glass-panel rounded-2xl p-8">
             <form method="POST" action="{{ route('setup-address.post') }}" class="flex flex-col gap-5">
                 @csrf
 
-                <!-- Nama Komplek (Dropdown) -->
+                <!-- Nama Komplek (Dropdown - Dynamic) -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="komplek" class="block font-medium text-sm text-on-surface">Nama Komplek</label>
+                    <label for="komplek_id" class="block font-medium text-sm text-on-surface">Nama Komplek</label>
                     <div class="relative">
-                        <select id="komplek" name="komplek" required
-                            class="block w-full appearance-none rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors">
-                            <option value="" disabled selected>Pilih komplek perumahan</option>
-                            <option value="1">Green Valley Residence</option>
-                            <option value="2">Permata Hijau Permai</option>
-                            <option value="3">Bukit Asri Cluster</option>
+                        <select id="komplek_id" name="komplek_id" required
+                            class="block w-full appearance-none rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('komplek_id') border-red-500 @enderror">
+                            <option value="" disabled {{ old('komplek_id') ? '' : 'selected' }}>Pilih komplek perumahan</option>
+                            @foreach ($komplek as $k)
+                                <option value="{{ $k->id }}" {{ old('komplek_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_komplek }}</option>
+                            @endforeach
                         </select>
                         <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
                     </div>
+                    @error('komplek_id')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Blok / Nomor Rumah -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="blok_nomor" class="block font-medium text-sm text-on-surface">Blok / Nomor Rumah</label>
-                    <input id="blok_nomor" type="text" name="blok_nomor" required
-                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
+                    <label for="blok_nomor_rumah" class="block font-medium text-sm text-on-surface">Blok / Nomor Rumah</label>
+                    <input id="blok_nomor_rumah" type="text" name="blok_nomor_rumah" value="{{ old('blok_nomor_rumah') }}" required
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('blok_nomor_rumah') border-red-500 @enderror"
                         placeholder="Contoh: Blok B4 No. 12">
+                    @error('blok_nomor_rumah')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Detail Alamat (Opsional) -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="detail" class="block font-medium text-sm text-on-surface">Detail Tambahan (Opsional)</label>
-                    <textarea id="detail" name="detail" rows="3"
-                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
-                        placeholder="Patokan rumah, warna pagar, atau instruksi khusus untuk petugas"></textarea>
+                    <label for="detail_patokan" class="block font-medium text-sm text-on-surface">Detail Tambahan (Opsional)</label>
+                    <textarea id="detail_patokan" name="detail_patokan" rows="3"
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('detail_patokan') border-red-500 @enderror"
+                        placeholder="Patokan rumah, warna pagar, atau instruksi khusus untuk petugas">{{ old('detail_patokan') }}</textarea>
+                    @error('detail_patokan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mt-4 flex flex-col gap-4">
@@ -76,9 +106,12 @@
                         <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
                     
-                    <button type="button" onclick="history.back()" class="text-center text-sm text-on-surface-variant hover:text-on-surface transition-colors">
-                        Kembali ke pendaftaran
-                    </button>
+                    <form method="POST" action="{{ route('logout') }}" class="text-center">
+                        @csrf
+                        <button type="submit" class="text-sm text-on-surface-variant hover:text-on-surface transition-colors">
+                            Keluar dari akun
+                        </button>
+                    </form>
                 </div>
             </form>
         </div>

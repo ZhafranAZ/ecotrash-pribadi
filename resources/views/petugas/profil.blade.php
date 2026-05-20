@@ -171,7 +171,10 @@
                         <p class="text-sm text-on-surface-variant mb-6">Anda harus masuk kembali menggunakan kredensial untuk dapat menerima tugas lagi.</p>
                         <div class="flex gap-3">
                             <button @click="showLogoutModal = false" class="flex-1 py-3 rounded-xl font-bold text-on-surface bg-surface-variant transition-colors">Batal</button>
-                            <a href="/" class="flex-1 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 transition-colors inline-flex justify-center items-center">Ya, Keluar</a>
+                            <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                                @csrf
+                                <button type="submit" class="w-full py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 transition-colors inline-flex justify-center items-center">Ya, Keluar</button>
+                            </form>
                         </div>
                     </div>
                 </div>

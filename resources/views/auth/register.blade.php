@@ -30,6 +30,21 @@
             <p class="text-on-surface-variant text-sm px-4">Langkah awal untuk lingkungan komplek yang lebih bersih dan asri.</p>
         </div>
 
+        <!-- Global Error Messages -->
+        @if ($errors->any())
+            <div class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200">
+                <div class="flex items-center gap-2 text-red-700 text-sm font-medium mb-1">
+                    <span class="material-symbols-outlined text-[18px]">error</span>
+                    Terjadi kesalahan:
+                </div>
+                <ul class="list-disc list-inside text-red-600 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Register Card -->
         <div class="glass-panel rounded-2xl p-8">
             <form method="POST" action="{{ route('register.post') }}" class="flex flex-col gap-5">
@@ -37,35 +52,47 @@
 
                 <!-- Name -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="name" class="block font-medium text-sm text-on-surface">Nama Lengkap</label>
-                    <input id="name" type="text" name="name" required autofocus autocomplete="name"
-                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
+                    <label for="nama" class="block font-medium text-sm text-on-surface">Nama Lengkap</label>
+                    <input id="nama" type="text" name="nama" value="{{ old('nama') }}" required autofocus autocomplete="name"
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('nama') border-red-500 @enderror"
                         placeholder="Masukkan nama lengkap Anda">
+                    @error('nama')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Phone Number -->
                 <div class="flex flex-col gap-1.5">
                     <label for="no_telepon" class="block font-medium text-sm text-on-surface">Nomor Telepon</label>
-                    <input id="no_telepon" type="tel" name="no_telepon" required
-                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
+                    <input id="no_telepon" type="tel" name="no_telepon" value="{{ old('no_telepon') }}" required
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('no_telepon') border-red-500 @enderror"
                         placeholder="Contoh: 081234567890">
                     <p class="text-xs text-on-surface-variant">Nomor telepon dapat diubah nanti melalui pengaturan profil.</p>
+                    @error('no_telepon')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Email Address -->
                 <div class="flex flex-col gap-1.5">
                     <label for="email" class="block font-medium text-sm text-on-surface">Email</label>
-                    <input id="email" type="email" name="email" required autocomplete="username"
-                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username"
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('email') border-red-500 @enderror"
                         placeholder="contoh@email.com">
+                    @error('email')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Password -->
                 <div class="flex flex-col gap-1.5">
                     <label for="password" class="block font-medium text-sm text-on-surface">Password</label>
                     <input id="password" type="password" name="password" required autocomplete="new-password"
-                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors"
+                        class="block w-full rounded-lg border-outline-variant bg-white/50 px-4 py-2.5 text-on-surface shadow-sm focus:border-primary focus:ring focus:ring-primary/20 transition-colors @error('password') border-red-500 @enderror"
                         placeholder="Buat password minimal 8 karakter">
+                    @error('password')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Confirm Password -->
@@ -83,7 +110,7 @@
                     
                     <p class="text-center text-sm text-on-surface-variant mt-2">
                         Sudah punya akun? 
-                        <a href="/login" class="text-primary font-bold hover:text-primary-dark transition-colors">Masuk di sini</a>
+                        <a href="{{ route('login') }}" class="text-primary font-bold hover:text-primary-dark transition-colors">Masuk di sini</a>
                     </p>
                 </div>
             </form>

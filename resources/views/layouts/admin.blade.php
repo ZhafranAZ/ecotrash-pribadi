@@ -89,10 +89,13 @@
                 <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
                 Profil Saya
             </a>
-            <a href="/" class="w-full flex items-center justify-center gap-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium">
-                <span class="material-symbols-outlined text-[18px]">logout</span>
-                Keluar
-            </a>
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    Keluar
+                </button>
+            </form>
         </div>
     </aside>
 

@@ -248,8 +248,10 @@
                     <div class="flex gap-3">
                         <button @click="showLogoutModal = false"
                             class="flex-1 font-bold text-on-surface-variant py-3 rounded-xl bg-surface border border-outline hover:bg-surface-variant transition-colors">Batal</button>
-                        <a href="/"
-                            class="flex-1 font-bold text-white py-3 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 transition-colors flex items-center justify-center">Keluar</a>
+                        <form method="POST" action="{{ route('logout') }}" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full h-full font-bold text-white py-3 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 transition-colors flex items-center justify-center">Keluar</button>
+                        </form>
                     </div>
                 </div>
             </div>
