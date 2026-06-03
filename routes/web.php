@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Warga\PesananController;
 
 // Landing page
 Route::get('/', function () {
@@ -51,13 +52,9 @@ Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'addre
     })->name('profil.index');
 
     // Pesan
-    Route::get('/pesan/create', function () {
-        return view('warga.pesan.create');
-    })->name('pesan.create');
-
-    Route::get('/pesan/berhasil', function () {
-        return view('warga.pesan.berhasil');
-    })->name('pesan.berhasil');
+    Route::get('/pesan/create', [PesananController::class, 'create'])->name('pesan.create');
+    Route::post('/pesan/checkout', [PesananController::class, 'store'])->name('pesan.checkout');
+    Route::get('/pesan/berhasil/{id}', [PesananController::class, 'success'])->name('pesan.berhasil');
 
     // Lapor
     Route::get('/lapor/create', function () {

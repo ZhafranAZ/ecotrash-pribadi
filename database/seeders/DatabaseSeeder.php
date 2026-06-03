@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             'no_telepon' => '081200000002',
             'password' => 'password',
             'role' => 'warga',
-            'saldo_koin' => 0,
+            'saldo_koin' => 500,
         ]);
 
         $petugas = User::create([

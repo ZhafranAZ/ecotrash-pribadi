@@ -12,22 +12,38 @@
 @endsection
 
 @section('content')
+@php
+    $formattedAddresses = $alamatList->map(function($alamat) {
+        return [
+            'id' => $alamat->id,
+            'title' => $alamat->nama_alamat,
+            'komplek' => $alamat->komplek->nama_komplek,
+            'detail' => $alamat->blok_nomor_rumah
+        ];
+    });
+@endphp
 <div class="md:bg-transparent min-h-[calc(100vh-120px)] md:min-h-0" x-data="{
     step: 1,
     kategori: 'Sedang',
     jadwal: '',
-    saldo: 450,
+    saldo: {{ $saldoKoin }},
     koin: 0,
-    hargaBase: 25000,
-    get totalHarga() { return this.hargaBase - (this.koin * 100); },
+    konversiKoin: {{ $pengaturan->konversi_koin_rupiah }},
+    hargaMap: {
+        'Kecil': {{ $pengaturan->harga_kategori_kecil }},
+        'Sedang': {{ $pengaturan->harga_kategori_sedang }},
+        'Besar': {{ $pengaturan->harga_kategori_besar }}
+    },
+    jadwalList: {{ json_encode($jadwalList) }},
+    catatan: '',
+    errorMessage: '',
+    get hargaBase() { return this.hargaMap[this.kategori] || 0; },
+    get totalHarga() { return this.hargaBase - (this.koin * this.konversiKoin); },
     showAddressModal: false,
     showAddAddressForm: false,
     isSuccess: false,
-    addresses: [
-        { id: 1, title: 'Rumah Utama', komplek: 'Bunga Asri', detail: 'Blok C2 No. 15, RT 04 RW 02' },
-        { id: 2, title: 'Kantor', komplek: 'Griya Indah', detail: 'Gedung X Lt. 4, Sudirman' }
-    ],
-    selectedAddressId: 1,
+    addresses: {{ json_encode($formattedAddresses) }},
+    selectedAddressId: {{ $alamatList->first()->id ?? 1 }},
     showEditAddressForm: false,
     editingAddress: { id: null, title: '', komplek: '', detail: '' },
     get selectedAddress() { 
@@ -52,9 +68,19 @@
     isPaying: false,
     processPayment() {
         this.isPaying = true;
-        setTimeout(() => {
-            window.location.href = '{{ route('warga.pesan.berhasil') }}';
-        }, 2000);
+        this.errorMessage = '';
+        axios.post('{{ route('warga.pesan.checkout') }}', {
+            alamat_id: this.selectedAddressId,
+            kategori: this.kategori,
+            jadwal: this.jadwal,
+            koin: this.koin,
+            catatan: this.catatan,
+        }).then(response => {
+            window.location.href = response.data.redirect_url;
+        }).catch(error => {
+            this.isPaying = false;
+            this.errorMessage = error.response?.data?.message || 'Terjadi kesalahan saat memproses pesanan.';
+        });
     }
 } ">
     <!-- Progress Bar (Mobile Only - on desktop we can use sidebar steps) -->
@@ -124,9 +150,9 @@
                             <div class="flex-1 md:w-full">
                                 <p class="font-bold text-sm md:text-base text-on-surface">Kecil</p>
                                 <p class="text-xs text-on-surface-variant mt-1">1-2 Kantong Kresek</p>
-                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+10 Koin Eco</p>
+                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+{{ $pengaturan->bonus_koin_kecil }} Koin Eco</p>
                             </div>
-                            <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Kecil'">Rp15.000</p>
+                            <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Kecil'" x-text="'Rp' + hargaMap['Kecil'].toLocaleString('id-ID')"></p>
                         </label>
                         <label class="border rounded-2xl p-5 flex md:flex-col items-center md:items-start md:justify-between gap-4 cursor-pointer transition-all hover:shadow-md" :class="kategori === 'Sedang' ? 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm' : 'border-outline hover:bg-surface-variant'">
                             <input type="radio" name="kategori" value="Sedang" x-model="kategori" class="hidden">
@@ -134,9 +160,9 @@
                             <div class="flex-1 md:w-full">
                                 <p class="font-bold text-sm md:text-base text-on-surface">Sedang</p>
                                 <p class="text-xs text-on-surface-variant mt-1">1 Tempat Sampah Penuh</p>
-                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+20 Koin Eco</p>
+                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+{{ $pengaturan->bonus_koin_sedang }} Koin Eco</p>
                             </div>
-                            <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Sedang'">Rp25.000</p>
+                            <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Sedang'" x-text="'Rp' + hargaMap['Sedang'].toLocaleString('id-ID')"></p>
                         </label>
                         <label class="border rounded-2xl p-5 flex md:flex-col items-center md:items-start md:justify-between gap-4 cursor-pointer transition-all hover:shadow-md" :class="kategori === 'Besar' ? 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-sm' : 'border-outline hover:bg-surface-variant'">
                             <input type="radio" name="kategori" value="Besar" x-model="kategori" class="hidden">
@@ -144,15 +170,15 @@
                             <div class="flex-1 md:w-full">
                                 <p class="font-bold text-sm md:text-base text-on-surface">Besar</p>
                                 <p class="text-xs text-on-surface-variant mt-1">>2 Tempat Sampah</p>
-                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+35 Koin Eco</p>
+                                <p class="text-xs font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md mt-2 inline-block">+{{ $pengaturan->bonus_koin_besar }} Koin Eco</p>
                             </div>
-                            <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Besar'">Rp40.000</p>
+                            <p class="text-sm font-bold text-on-surface md:mt-4 md:text-primary md:bg-white md:px-3 md:py-1 md:rounded-lg md:shadow-sm" x-show="kategori==='Besar'" x-text="'Rp' + hargaMap['Besar'].toLocaleString('id-ID')"></p>
                         </label>
                     </div>
                 </div>
 
                 <div class="pt-4 md:hidden">
-                    <button @click="step = 2; hargaBase = kategori === 'Kecil' ? 15000 : (kategori === 'Sedang' ? 25000 : 40000)" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-transform">
+                    <button @click="step = 2" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 active:scale-95 transition-transform">
                         Lanjut Pilih Jadwal
                     </button>
                 </div>
@@ -167,36 +193,23 @@
                 <div>
                     <div class="flex items-center justify-between mb-4 md:mb-6">
                         <h3 class="font-bold text-on-surface md:text-lg">Pilih Jadwal (Minggu Ini)</h3>
-                        <span class="text-xs md:text-sm font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">Periode: 11 - 17 Mei</span>
+                        <span class="text-xs md:text-sm font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20">Periode: {{ $periodeLabel }}</span>
                     </div>
                     
                     <div class="grid grid-cols-4 md:grid-cols-4 gap-3 md:gap-4">
-                        <label class="border rounded-2xl p-4 md:py-6 flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md" :class="jadwal === 'Senin' ? 'border-primary bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary/20' : 'border-outline bg-white hover:border-primary/50 text-on-surface'">
-                            <input type="radio" name="jadwal" value="Senin" x-model="jadwal" class="hidden">
-                            <span class="text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest">Sen</span>
-                            <span class="text-2xl md:text-3xl font-black">11</span>
-                        </label>
-                        <label class="border rounded-2xl p-4 md:py-6 flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md" :class="jadwal === 'Selasa' ? 'border-primary bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary/20' : 'border-outline bg-white hover:border-primary/50 text-on-surface'">
-                            <input type="radio" name="jadwal" value="Selasa" x-model="jadwal" class="hidden">
-                            <span class="text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest">Sel</span>
-                            <span class="text-2xl md:text-3xl font-black">12</span>
-                        </label>
-                        <label class="border rounded-2xl p-4 md:py-6 flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md" :class="jadwal === 'Kamis' ? 'border-primary bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary/20' : 'border-outline bg-white hover:border-primary/50 text-on-surface'">
-                            <input type="radio" name="jadwal" value="Kamis" x-model="jadwal" class="hidden">
-                            <span class="text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest">Kam</span>
-                            <span class="text-2xl md:text-3xl font-black">14</span>
-                        </label>
-                        <label class="border rounded-2xl p-4 md:py-6 flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md" :class="jadwal === 'Jumat' ? 'border-primary bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary/20' : 'border-outline bg-white hover:border-primary/50 text-on-surface'">
-                            <input type="radio" name="jadwal" value="Jumat" x-model="jadwal" class="hidden">
-                            <span class="text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest">Jum</span>
-                            <span class="text-2xl md:text-3xl font-black">15</span>
-                        </label>
+                        <template x-for="item in jadwalList" :key="item.tanggal">
+                            <label class="border rounded-2xl p-4 md:py-6 flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md" :class="jadwal === item.tanggal ? 'border-primary bg-primary text-white shadow-lg shadow-primary/30 ring-2 ring-primary/20' : 'border-outline bg-white hover:border-primary/50 text-on-surface'">
+                                <input type="radio" name="jadwal" :value="item.tanggal" x-model="jadwal" class="hidden">
+                                <span class="text-xs md:text-sm font-bold opacity-80 uppercase tracking-widest" x-text="item.label"></span>
+                                <span class="text-2xl md:text-3xl font-black" x-text="item.tgl"></span>
+                            </label>
+                        </template>
                     </div>
                 </div>
 
                 <div class="mt-8">
                     <h3 class="font-bold text-on-surface mb-3 md:text-lg">Catatan (Opsional)</h3>
-                    <textarea class="w-full border border-outline rounded-2xl p-4 text-sm md:text-base focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-surface hover:bg-white" rows="3" placeholder="Misal: Tolong ketuk pagar 3 kali, anjing galak..."></textarea>
+                    <textarea class="w-full border border-outline rounded-2xl p-4 text-sm md:text-base focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-surface hover:bg-white" rows="3" placeholder="Misal: Tolong ketuk pagar 3 kali, anjing galak..." x-model="catatan"></textarea>
                 </div>
 
                 <div class="flex gap-4 pt-4 md:hidden">
@@ -226,6 +239,7 @@
                  class="p-6 md:p-8 space-y-6 text-center max-w-sm mx-auto" style="display: none;">
                 
                 <h3 class="font-black text-xl text-on-surface">Pembayaran</h3>
+                <div x-show="errorMessage" x-transition.opacity x-text="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm font-bold p-3 rounded-xl text-center" style="display: none;"></div>
                 <p class="text-sm text-on-surface-variant">Scan QR Code di bawah ini menggunakan aplikasi M-Banking atau e-Wallet Anda.</p>
                 
                 <div class="bg-white p-4 rounded-3xl border border-outline shadow-sm inline-block mx-auto relative overflow-hidden">
@@ -285,12 +299,12 @@
                                 <p class="text-xs text-amber-700/80 mb-3 font-medium">Anda bisa memotong harga hingga <span x-text="'Rp' + (Math.floor(hargaBase * 0.5)).toLocaleString('id-ID')"></span></p>
                                 
                                 <div class="flex gap-3 items-center bg-white p-2 rounded-xl border border-amber-100 shadow-sm">
-                                    <input type="range" min="0" :max="Math.min(saldo, Math.floor(hargaBase * 0.5 / 100))" x-model="koin" class="flex-1 h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                    <input type="range" min="0" :max="Math.min(saldo, Math.floor(hargaBase * 0.5 / konversiKoin))" x-model="koin" class="flex-1 h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
                                     <span class="text-sm font-black text-amber-600 w-12 text-center" x-text="koin"></span>
                                 </div>
                                 <div class="flex justify-between text-sm mt-3 text-amber-600 font-bold bg-amber-100/50 p-2 rounded-lg" x-show="koin > 0">
                                     <span>Potongan:</span>
-                                    <span>-Rp<span x-text="(koin * 100).toLocaleString('id-ID')"></span></span>
+                                    <span>-Rp<span x-text="(koin * konversiKoin).toLocaleString('id-ID')"></span></span>
                                 </div>
                             </div>
                         </template>
@@ -310,7 +324,7 @@
                     <!-- Desktop Actions -->
                     <div class="hidden md:flex gap-3 pt-6">
                         <button x-show="step === 2" @click="step = 1" class="w-1/3 bg-white border border-outline text-on-surface font-bold py-4 rounded-xl hover:bg-surface-variant transition-colors">Kembali</button>
-                        <button x-show="step === 1" @click="step = 2; hargaBase = kategori === 'Kecil' ? 15000 : (kategori === 'Sedang' ? 25000 : 40000)" class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30">Pilih Jadwal</button>
+                        <button x-show="step === 1" @click="step = 2" class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary-dark transition-all shadow-lg shadow-primary/30">Pilih Jadwal</button>
                         
                         <button x-show="step === 2" @click="step = 3" :disabled="!jadwal" :class="jadwal ? 'bg-primary hover:bg-primary-dark shadow-lg shadow-primary/30' : 'bg-surface-variant text-on-surface-variant cursor-not-allowed'" class="w-2/3 text-white font-bold py-4 rounded-xl transition-all">Lanjut Checkout</button>
                         
