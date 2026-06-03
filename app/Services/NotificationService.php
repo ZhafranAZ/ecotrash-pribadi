@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Notifikasi;
+use App\Models\User;
 
 class NotificationService
 {

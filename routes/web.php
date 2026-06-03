@@ -65,13 +65,9 @@ Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'addre
     })->name('pesan.berhasil');
 
     // Lapor
-    Route::get('/lapor/create', function () {
-        return view('warga.lapor.create');
-    })->name('lapor.create');
-
-    Route::get('/lapor/berhasil', function () {
-        return view('warga.lapor.berhasil');
-    })->name('lapor.berhasil');
+    Route::get('/lapor/create', [LaporanController::class, 'create'])->name('lapor.create');
+    Route::post('/lapor', [LaporanController::class, 'store'])->name('lapor.store');
+    Route::get('/lapor/berhasil', [LaporanController::class, 'berhasil'])->name('lapor.berhasil');
 
     Route::get('/bantuan', function () {
         return view('warga.bantuan');
@@ -86,9 +82,10 @@ Route::get('/home', function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/laporan', function () {
-        return view('admin.laporan.index');
-    })->name('laporan.index');
+    Route::get('/laporan', [LaporanLiarController::class, 'index'])->name('laporan.index');
+    Route::post('/laporan/{id}/approve', [LaporanLiarController::class, 'approve'])->name('laporan.approve');
+    Route::post('/laporan/{id}/reject', [LaporanLiarController::class, 'reject'])->name('laporan.reject');
+    Route::post('/laporan/{id}/duplicate', [LaporanLiarController::class, 'markDuplicate'])->name('laporan.duplicate');
 
     Route::get('/operasional', [OperasionalController::class, 'index'])->name('operasional.index');
     Route::post('/operasional/assign-petugas', [OperasionalController::class, 'assignPetugas'])->name('operasional.assignPetugas');

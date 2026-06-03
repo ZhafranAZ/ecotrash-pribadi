@@ -91,50 +91,79 @@
             <!-- Mobile pull indicator -->
             <div class="w-12 h-1.5 bg-surface-variant rounded-full mx-auto my-3 md:hidden"></div>
             
-            <div class="px-6 pb-6 md:p-8 overflow-y-auto flex-1 flex flex-col gap-6 md:gap-8 pt-2 md:pt-8">
-                <div>
-                    <h3 class="font-bold text-on-surface text-xl md:text-2xl mb-1">Detail Laporan</h3>
-                    <p class="text-sm text-on-surface-variant">Sertakan foto bukti agar petugas mudah menemukan titik sampah.</p>
-                </div>
+            <form method="POST" action="{{ route('warga.lapor.store') }}" enctype="multipart/form-data" id="laporForm">
+                @csrf
+                <input type="hidden" name="lat" id="lat">
+                <input type="hidden" name="lng" id="lng">
 
-                <!-- Foto Upload -->
-                <div>
-                    <input type="file" id="foto" accept="image/*" class="hidden" @change="handleFile">
-                    
-                    <template x-if="!fotoPreview">
-                        <label for="foto" class="w-full h-40 md:h-48 border-2 border-dashed border-primary/40 rounded-2xl bg-primary/5 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-primary/10 transition-colors text-primary group">
-                            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
-                            </div>
-                            <span class="text-sm font-bold text-primary">Unggah Foto Lokasi</span>
-                        </label>
-                    </template>
+                <div class="px-6 pb-6 md:p-8 overflow-y-auto flex-1 flex flex-col gap-6 md:gap-8 pt-2 md:pt-8">
+                    <div>
+                        <h3 class="font-bold text-on-surface text-xl md:text-2xl mb-1">Detail Laporan</h3>
+                        <p class="text-sm text-on-surface-variant">Sertakan foto bukti agar petugas mudah menemukan titik sampah.</p>
+                    </div>
 
-                    <template x-if="fotoPreview">
-                        <div class="relative w-full h-48 md:h-56 rounded-2xl overflow-hidden border border-outline shadow-sm group">
-                            <img :src="fotoPreview" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <button @click="fotoPreview = null" class="w-12 h-12 bg-white/20 text-white flex items-center justify-center rounded-full backdrop-blur-md hover:bg-red-500 transition-colors">
-                                    <span class="material-symbols-outlined text-[24px]">delete</span>
-                                </button>
+                    {{-- Server-side validation errors --}}
+                    @if ($errors->any())
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                            <div class="flex gap-2 items-start">
+                                <span class="material-symbols-outlined text-red-500 text-[20px] shrink-0 mt-0.5">error</span>
+                                <div>
+                                    <p class="text-sm font-bold text-red-700 mb-1">Terdapat kesalahan:</p>
+                                    <ul class="text-xs text-red-600 list-disc list-inside space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </template>
-                </div>
+                    @endif
 
-                <!-- Deskripsi -->
-                <div>
-                    <label class="block text-sm font-bold text-on-surface mb-3">Keterangan / Deskripsi</label>
-                    <textarea x-model="deskripsi" class="w-full border rounded-xl p-4 md:p-5 text-sm md:text-base focus:ring-2 outline-none transition-all bg-surface hover:bg-white" :class="deskripsi.length > 0 && deskripsi.length < 10 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline focus:border-primary focus:ring-primary/20'" rows="4" placeholder="Jelaskan secara singkat. Contoh: Sampah dibungkus karung putih di sebelah tiang listrik pinggir jalan..."></textarea>
-                    <p x-show="deskripsi.length > 0 && deskripsi.length < 10" class="text-xs text-red-500 mt-2 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span> Deskripsi minimal 10 karakter.</p>
-                </div>
+                    <!-- Foto Upload -->
+                    <div>
+                        <input type="file" id="foto" name="foto" accept="image/*" class="hidden" @change="handleFile">
+                        
+                        <template x-if="!fotoPreview">
+                            <label for="foto" class="w-full h-40 md:h-48 border-2 border-dashed border-primary/40 rounded-2xl bg-primary/5 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-primary/10 transition-colors text-primary group">
+                                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                    <span class="material-symbols-outlined text-[28px]">add_a_photo</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">Unggah Foto Lokasi</span>
+                            </label>
+                        </template>
 
-                <div class="mt-auto pt-4 pb-4 md:pb-0">
-                    <button @click="window.location.href='{{ route('warga.lapor.berhasil') }}'" :disabled="!fotoPreview || deskripsi.length < 10" :class="(fotoPreview && deskripsi.length >= 10) ? 'bg-orange-500 hover:bg-orange-600 shadow-xl shadow-orange-500/30' : 'bg-surface-variant text-on-surface-variant cursor-not-allowed'" class="w-full text-white font-bold py-4 md:py-5 rounded-xl md:rounded-2xl transition-all text-lg flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined">send</span> Kirim Laporan
-                    </button>
+                        <template x-if="fotoPreview">
+                            <div class="relative w-full h-48 md:h-56 rounded-2xl overflow-hidden border border-outline shadow-sm group">
+                                <img :src="fotoPreview" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <button type="button" @click="fotoPreview = null; document.getElementById('foto').value = ''" class="w-12 h-12 bg-white/20 text-white flex items-center justify-center rounded-full backdrop-blur-md hover:bg-red-500 transition-colors">
+                                        <span class="material-symbols-outlined text-[24px]">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                        @error('foto')
+                            <p class="text-xs text-red-500 mt-2 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span> {{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-3">Keterangan / Deskripsi</label>
+                        <textarea x-model="deskripsi" name="deskripsi" class="w-full border rounded-xl p-4 md:p-5 text-sm md:text-base focus:ring-2 outline-none transition-all bg-surface hover:bg-white" :class="deskripsi.length > 0 && deskripsi.length < 10 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline focus:border-primary focus:ring-primary/20'" rows="4" placeholder="Jelaskan secara singkat. Contoh: Sampah dibungkus karung putih di sebelah tiang listrik pinggir jalan...">{{ old('deskripsi') }}</textarea>
+                        <p x-show="deskripsi.length > 0 && deskripsi.length < 10" class="text-xs text-red-500 mt-2 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span> Deskripsi minimal 10 karakter.</p>
+                        @error('deskripsi')
+                            <p class="text-xs text-red-500 mt-2 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span> {{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mt-auto pt-4 pb-4 md:pb-0">
+                        <button type="submit" :disabled="!fotoPreview || deskripsi.length < 10" :class="(fotoPreview && deskripsi.length >= 10) ? 'bg-orange-500 hover:bg-orange-600 shadow-xl shadow-orange-500/30' : 'bg-surface-variant text-on-surface-variant cursor-not-allowed'" class="w-full text-white font-bold py-4 md:py-5 rounded-xl md:rounded-2xl transition-all text-lg flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">send</span> Kirim Laporan
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -149,6 +178,28 @@
             attribution: '&copy; OpenStreetMap',
             maxZoom: 19
         }).addTo(map);
+        
+        // Make map globally accessible for Alpine @click handlers
+        window.map = map;
+
+        // Set initial coordinates to hidden inputs
+        var center = map.getCenter();
+        document.getElementById('lat').value = center.lat.toFixed(7);
+        document.getElementById('lng').value = center.lng.toFixed(7);
+
+        // Update hidden inputs when map moves
+        map.on('moveend', function () {
+            var center = map.getCenter();
+            document.getElementById('lat').value = center.lat.toFixed(7);
+            document.getElementById('lng').value = center.lng.toFixed(7);
+        });
+
+        // Also set coordinates right before form submit as safety net
+        document.getElementById('laporForm').addEventListener('submit', function () {
+            var center = map.getCenter();
+            document.getElementById('lat').value = center.lat.toFixed(7);
+            document.getElementById('lng').value = center.lng.toFixed(7);
+        });
         
         // Trigger resize calculation after map container might change on desktop load
         setTimeout(() => map.invalidateSize(), 100);

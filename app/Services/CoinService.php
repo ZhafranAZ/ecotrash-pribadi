@@ -2,30 +2,27 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\RiwayatKoin;
+use App\Models\User;
 
 class CoinService
 {
     /**
-     * Tambahkan koin ke saldo warga dan catat riwayatnya.
-     *
-     * @param int    $wargaId     ID user warga
-     * @param int    $jumlah      Jumlah koin yang ditambahkan
-     * @param string $referensiId ID pesanan sebagai referensi
+     * Tambahkan koin ke saldo warga dan catat di riwayat_koin.
      */
-    public static function addCoins(int $wargaId, int $jumlah, string $referensiId): void
+    public function addCoins(User $user, int $amount, string $sumber, ?string $referensiId = null): RiwayatKoin
     {
         // Tambah saldo_koin di tabel users
-        User::where('id', $wargaId)->increment('saldo_koin', $jumlah);
+        $user->increment('saldo_koin', $amount);
 
-        // Catat ke riwayat_koin
-        RiwayatKoin::create([
-            'warga_id'       => $wargaId,
-            'tipe_transaksi' => 'masuk',
-            'jumlah'         => $jumlah,
-            'sumber'         => 'pesanan',
-            'referensi_id'   => $referensiId,
+        // Catat di riwayat_koin
+        return RiwayatKoin::create([
+            'warga_id'        => $user->id,
+            'tipe_transaksi'  => 'masuk',
+            'jumlah'          => $amount,
+            'sumber'          => $sumber,
+            'referensi_id'    => $referensiId,
+            'expired_at'      => now()->addMonths(6),
         ]);
     }
 }

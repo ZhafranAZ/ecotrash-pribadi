@@ -18,6 +18,10 @@
     <h1 class="text-3xl font-black text-on-surface mb-2">Laporan Terkirim!</h1>
     <p class="text-on-surface-variant mb-8 max-w-sm">Terima kasih atas kepedulian Anda terhadap lingkungan. Laporan tumpukan sampah liar telah masuk ke antrean admin untuk ditinjau.</p>
     
+    @php
+        $laporan = session('laporan');
+    @endphp
+
     <div class="bg-surface border border-outline rounded-2xl p-4 w-full max-w-sm mb-10 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
@@ -25,7 +29,13 @@
             </div>
             <div class="text-left">
                 <p class="font-bold text-sm text-on-surface">No. Tiket</p>
-                <p class="text-xs text-on-surface-variant font-mono">REP-260515-002</p>
+                <p class="text-xs text-on-surface-variant font-mono">
+                    @if($laporan)
+                        REP-{{ $laporan->created_at->format('ymd') }}-{{ str_pad($laporan->id, 3, '0', STR_PAD_LEFT) }}
+                    @else
+                        -
+                    @endif
+                </p>
             </div>
         </div>
         <span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-md border border-orange-200">Menunggu</span>
