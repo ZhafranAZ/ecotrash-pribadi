@@ -17,6 +17,7 @@ class PesananPengangkutan extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'id',
         'warga_id',
         'komplek_id',
         'nama_alamat_snapshot',
