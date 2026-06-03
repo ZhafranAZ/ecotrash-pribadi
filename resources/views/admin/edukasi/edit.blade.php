@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Tulis Artikel Edukasi')
-@section('subtitle', 'Buat konten edukasi baru untuk dibagikan kepada warga.')
+@section('title', 'Edit Artikel Edukasi')
+@section('subtitle', 'Ubah rincian artikel dan terbitkan kembali untuk warga.')
 
 @push('styles')
 <!-- Quill.js Theme included via CDN -->
@@ -108,14 +108,15 @@
         <li><span class="material-symbols-outlined text-[16px] opacity-50">chevron_right</span></li>
         <li><a href="{{ route('admin.edukasi.index') }}" class="hover:text-primary transition-colors">Edukasi</a></li>
         <li><span class="material-symbols-outlined text-[16px] opacity-50">chevron_right</span></li>
-        <li class="text-on-surface font-semibold">Artikel Baru</li>
+        <li class="text-on-surface font-semibold">Edit Artikel</li>
     </ol>
 </nav>
 
 <div class="bg-white rounded-xl border border-outline shadow-sm overflow-hidden mb-8">
     <div class="p-6">
-        <form id="artikel-form" action="{{ route('admin.edukasi.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-6">
+        <form id="artikel-form" action="{{ route('admin.edukasi.update', $artikel->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-6">
             @csrf
+            @method('PUT')
             <!-- Header Actions -->
             <div class="flex items-center justify-between pb-4 border-b border-outline">
                 <a href="{{ route('admin.edukasi.index') }}" class="text-on-surface-variant hover:text-on-surface flex items-center gap-1 text-sm font-medium transition-colors">
@@ -124,7 +125,7 @@
                 <div class="flex gap-2">
                     <button type="button" @click="$dispatch('show-toast', { message: 'Fitur Simpan Draf tidak didukung saat ini.', type: 'warning' })" class="px-4 py-2 bg-surface-variant text-on-surface hover:bg-outline rounded-lg text-sm font-bold transition-colors">Simpan Draf</button>
                     <button type="submit" class="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded-lg text-sm font-bold transition-colors flex items-center gap-2 shadow-md">
-                        <span class="material-symbols-outlined text-[18px]">publish</span> Terbitkan
+                        <span class="material-symbols-outlined text-[18px]">save</span> Simpan Perubahan
                     </button>
                 </div>
             </div>
@@ -133,7 +134,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="col-span-2">
                     <label class="block font-medium text-sm text-on-surface mb-1">Judul Artikel <span class="text-red-500">*</span></label>
-                    <input type="text" name="judul" value="{{ old('judul') }}" placeholder="Masukkan judul yang menarik..." class="w-full px-4 py-2.5 border border-outline-variant rounded-lg text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none font-semibold text-lg @error('judul') border-red-500 @enderror">
+                    <input type="text" name="judul" value="{{ old('judul', $artikel->judul) }}" placeholder="Masukkan judul yang menarik..." class="w-full px-4 py-2.5 border border-outline-variant rounded-lg text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none font-semibold text-lg @error('judul') border-red-500 @enderror">
                     @error('judul')
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                     @enderror
@@ -141,10 +142,10 @@
                 <div>
                     <label class="block font-medium text-sm text-on-surface mb-1">Kategori <span class="text-red-500">*</span></label>
                     <select name="kategori" class="w-full px-4 py-3 border border-outline-variant rounded-lg text-sm text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none @error('kategori') border-red-500 @enderror">
-                        <option value="daur_ulang" {{ old('kategori') === 'daur_ulang' ? 'selected' : '' }}>Daur Ulang</option>
-                        <option value="kompos" {{ old('kategori') === 'kompos' ? 'selected' : '' }}>Kompos</option>
-                        <option value="b3" {{ old('kategori') === 'b3' ? 'selected' : '' }}>B3</option>
-                        <option value="tips" {{ old('kategori') === 'tips' ? 'selected' : '' }}>Tips Lingkungan</option>
+                        <option value="daur_ulang" {{ old('kategori', $artikel->kategori) === 'daur_ulang' ? 'selected' : '' }}>Daur Ulang</option>
+                        <option value="kompos" {{ old('kategori', $artikel->kategori) === 'kompos' ? 'selected' : '' }}>Kompos</option>
+                        <option value="b3" {{ old('kategori', $artikel->kategori) === 'b3' ? 'selected' : '' }}>B3</option>
+                        <option value="tips" {{ old('kategori', $artikel->kategori) === 'tips' ? 'selected' : '' }}>Tips Lingkungan</option>
                     </select>
                     @error('kategori')
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
@@ -153,14 +154,14 @@
             </div>
 
             <!-- Thumbnail Upload -->
-            <div x-data="{ previewUrl: null }">
+            <div x-data="{ previewUrl: '{{ $artikel->gambar_thumbnail ? asset($artikel->gambar_thumbnail) : null }}' }">
                 <label class="block font-medium text-sm text-on-surface mb-1">Gambar Thumbnail <span class="text-red-500">*</span></label>
                 <input type="file" name="gambar_thumbnail" id="gambar_thumbnail" accept="image/*" class="hidden" @change="const file = $event.target.files[0]; if (file) { previewUrl = URL.createObjectURL(file); }">
                 <div onclick="document.getElementById('gambar_thumbnail').click()" class="w-full min-h-[10rem] border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-dim hover:border-primary transition-colors cursor-pointer group p-4">
                     <template x-if="!previewUrl">
                         <div class="flex flex-col items-center">
                             <span class="material-symbols-outlined text-[40px] mb-2 group-hover:text-primary transition-colors">cloud_upload</span>
-                            <p class="text-sm font-medium">Klik untuk memilih gambar</p>
+                            <p class="text-sm font-medium">Klik untuk memilih gambar baru</p>
                             <p class="text-xs mt-1">PNG, JPG up to 2MB. Resolusi ideal 1200x630px.</p>
                         </div>
                     </template>
@@ -181,7 +182,7 @@
             <!-- WYSIWYG Editor -->
             <div>
                 <label class="block font-medium text-sm text-on-surface mb-1">Konten Artikel <span class="text-red-500">*</span></label>
-                <input type="hidden" name="konten_html" id="konten_html" value="{{ old('konten_html') }}">
+                <input type="hidden" name="konten_html" id="konten_html" value="{{ old('konten_html', $artikel->konten_html) }}">
                 <!-- Editor Container -->
                 <div id="editor-container"></div>
                 @error('konten_html')
@@ -223,10 +224,10 @@
             }
         });
 
-        // Set old content if available
-        var oldContent = document.getElementById('konten_html').value;
-        if (oldContent) {
-            quill.root.innerHTML = oldContent;
+        // Set content from database
+        var contentVal = document.getElementById('konten_html').value;
+        if (contentVal) {
+            quill.root.innerHTML = contentVal;
         }
 
         // Update hidden input on submit

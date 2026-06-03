@@ -40,17 +40,10 @@ Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'addre
 
     Route::get('/aktivitas', [AktivitasController::class, 'index'])->name('aktivitas.index');
 
-    Route::get('/edukasi', function () {
-        return view('warga.edukasi.index');
-    })->name('edukasi.index');
-
-    Route::get('/edukasi/tersimpan', function () {
-        return view('warga.edukasi.tersimpan');
-    })->name('edukasi.tersimpan');
-
-    Route::get('/edukasi/{id}', function ($id) {
-        return view('warga.edukasi.show', compact('id'));
-    })->name('edukasi.show');
+    Route::get('/edukasi', [App\Http\Controllers\Warga\EdukasiWargaController::class, 'index'])->name('edukasi.index');
+    Route::get('/edukasi/tersimpan', [App\Http\Controllers\Warga\EdukasiWargaController::class, 'tersimpan'])->name('edukasi.tersimpan');
+    Route::get('/edukasi/{id}', [App\Http\Controllers\Warga\EdukasiWargaController::class, 'show'])->name('edukasi.show');
+    Route::post('/edukasi/{id}/bookmark', [App\Http\Controllers\Warga\EdukasiWargaController::class, 'toggleBookmark'])->name('edukasi.bookmark');
 
     Route::get('/profil', function () {
         return view('warga.profil.index');
@@ -91,13 +84,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         return view('admin.pengguna.index');
     })->name('pengguna.index');
 
-    Route::get('/edukasi', function () {
-        return view('admin.edukasi.index');
-    })->name('edukasi.index');
-
-    Route::get('/edukasi/create', function () {
-        return view('admin.edukasi.create');
-    })->name('edukasi.create');
+    Route::resource('edukasi', App\Http\Controllers\Admin\EdukasiController::class);
 
     Route::get('/pengaturan', function () {
         return view('admin.pengaturan.index');

@@ -108,7 +108,7 @@
                 </div>
                 <div class="flex-1">
                     <p class="font-bold text-base md:text-lg text-on-surface">Artikel Edukasi Tersimpan</p>
-                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">Anda menyimpan 2 panduan.</p>
+                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">Anda menyimpan {{ auth()->user()->bookmarkArtikel()->count() }} artikel.</p>
                 </div>
                 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
             </a>
