@@ -18,6 +18,12 @@ class PenggunaController extends Controller
     public function index(): View
     {
         $wargaList = User::where('role', 'warga')
+            ->withCount([
+                'pesananSebagaiWarga as pesanan_selesai_count' => function ($query) {
+                    $query->where('status', 'selesai');
+                },
+                'laporanSebagaiWarga as laporan_count'
+            ])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 

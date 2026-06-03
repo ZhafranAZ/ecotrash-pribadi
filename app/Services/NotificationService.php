@@ -16,25 +16,16 @@ class NotificationService
      * @param string $tipe   Tipe notifikasi: 'info', 'warning', 'success', 'error'
      * @return Notifikasi Record notifikasi yang dibuat
      */
-    public function send(int $userId, string $judul, string $pesan, string $tipe = 'info'): Notifikasi
+    public static function send(mixed $user, string $judul, string $pesan, string $tipe = 'info'): Notifikasi
     {
+        $userId = $user instanceof User ? $user->id : $user;
+
         // Validasi tipe notifikasi
         $allowedTypes = ['info', 'warning', 'success', 'error'];
         if (!in_array($tipe, $allowedTypes)) {
             $tipe = 'info';
         }
 
-     * Kirim notifikasi ke user tertentu.
-     * Digunakan oleh modul lain (3, 4, 5, 6) sebagai "Tukang Pos" terpusat.
-     *
-     * @param int    $userId  ID user penerima notifikasi
-     * @param string $judul   Judul notifikasi (cth: "Pesanan Selesai!")
-     * @param string $pesan   Isi pesan notifikasi
-     * @param string $tipe    Tipe notifikasi: 'info', 'warning', 'success', 'error'
-     * @return Notifikasi
-     */
-    public static function send(int $userId, string $judul, string $pesan, string $tipe = 'info'): Notifikasi
-    {
         return Notifikasi::create([
             'user_id' => $userId,
             'judul'   => $judul,

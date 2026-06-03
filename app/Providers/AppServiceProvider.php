@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
             if (Auth::check()) {
                 static $unreadNotifications = null;
                 static $unreadCount = null;
+                static $absentPetugasInfo = null;
 
                 if ($unreadNotifications === null) {
                     $unreadNotifications = Notifikasi::where('user_id', Auth::id())
@@ -44,11 +45,29 @@ class AppServiceProvider extends ServiceProvider
                         ->count();
                 }
 
+                if ($absentPetugasInfo === null) {
+                    $absentPetugas = \App\Models\User::where('role', 'petugas')
+                        ->where('status_kehadiran', 'berhalangan')
+                        ->with('petugasKomplek')
+                        ->first();
+                    if ($absentPetugas) {
+                        $komplekNames = $absentPetugas->petugasKomplek->pluck('nama_komplek')->implode(', ');
+                        $absentPetugasInfo = [
+                            'nama' => $absentPetugas->nama,
+                            'komplek' => $komplekNames ?: 'Tidak ada area tugas',
+                        ];
+                    } else {
+                        $absentPetugasInfo = false;
+                    }
+                }
+
                 $view->with('unreadNotifications', $unreadNotifications);
                 $view->with('unreadCount', $unreadCount);
+                $view->with('absentPetugasInfo', $absentPetugasInfo);
             } else {
                 $view->with('unreadNotifications', collect());
                 $view->with('unreadCount', 0);
+                $view->with('absentPetugasInfo', false);
             }
         });
     }

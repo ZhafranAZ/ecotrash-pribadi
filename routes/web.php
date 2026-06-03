@@ -12,6 +12,10 @@ use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
 use App\Http\Controllers\Warga\AktivitasController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Warga\LaporanController;
+use App\Http\Controllers\Admin\LaporanLiarController;
+use App\Http\Controllers\Admin\OperasionalController;
+use App\Http\Controllers\Petugas\TugasController;
 
 // Landing page
 Route::get('/', function () {
@@ -113,7 +117,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
 // --- Petugas Routes ---
 Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/beranda', [TindakLanjutController::class, 'beranda'])->name('beranda');
     Route::get('/beranda', [TugasController::class, 'index'])->name('beranda');
 
     Route::get('/komplek/{id}/warga', [TugasController::class, 'showKomplekWarga'])->name('komplek.warga');
@@ -129,13 +132,8 @@ Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])
     Route::post('/tugas/{id}/status', [TugasController::class, 'updateStatus'])->name('tugas.updateStatus');
     Route::post('/tugas/{id}/kendala', [TugasController::class, 'reportKendala'])->name('tugas.reportKendala');
 
-    Route::get('/riwayat', function () {
-        return view('petugas.riwayat');
-    })->name('riwayat');
-
-    Route::get('/riwayat/{id}', function ($id) {
-        return view('petugas.riwayat-detail', ['id' => $id]);
-    })->name('riwayat.detail');
+    Route::get('/riwayat', [TugasController::class, 'riwayat'])->name('riwayat');
+    Route::get('/riwayat/{type}/{id}', [TugasController::class, 'riwayatDetail'])->name('riwayat.detail');
 
     Route::get('/profil', function () {
         return view('petugas.profil');

@@ -98,8 +98,8 @@ class TindakLanjutController extends Controller
         ]);
 
         // Kirim notifikasi warning ke warga
-        $this->notificationService->send(
-            userId: $laporan->warga_id,
+        NotificationService::send(
+            user: $laporan->warga_id,
             judul: 'Pembersihan Ditunda',
             pesan: "Pembersihan tumpukan sampah di laporan #{$laporan->id} tertunda. Alasan: {$alasan}",
             tipe: 'warning'
@@ -166,8 +166,8 @@ class TindakLanjutController extends Controller
             $pesanNotif .= " Anda mendapat {$koinReward} koin bonus.";
         }
 
-        $this->notificationService->send(
-            userId: $laporan->warga_id,
+        NotificationService::send(
+            user: $laporan->warga_id,
             judul: 'Pembersihan Selesai',
             pesan: $pesanNotif,
             tipe: 'success'

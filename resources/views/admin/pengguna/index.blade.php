@@ -77,7 +77,7 @@
                             <td class="py-3 px-6 text-on-surface-variant">{{ $w->email }}<br><span class="text-xs">{{ $w->no_telepon }}</span></td>
                             <td class="py-3 px-6"><span class="inline-flex items-center gap-1 font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-200"><span class="material-symbols-outlined text-[16px]">monetization_on</span> {{ $w->saldo_koin }}</span></td>
                             <td class="py-3 px-6 text-right">
-                                <button @click="selectedWarga = {id: {{ $w->id }}, nama: '{{ addslashes($w->nama) }}', email: '{{ addslashes($w->email) }}', no_telepon: '{{ addslashes($w->no_telepon) }}', saldo_koin: {{ $w->saldo_koin }} }; showProfilModal = true" class="text-primary hover:bg-primary/10 p-1.5 rounded-md transition-colors" title="Lihat Profil"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+                                <button @click="selectedWarga = {id: {{ $w->id }}, nama: '{{ addslashes($w->nama) }}', email: '{{ addslashes($w->email) }}', no_telepon: '{{ addslashes($w->no_telepon) }}', saldo_koin: {{ $w->saldo_koin }}, pesanan_count: {{ $w->pesanan_selesai_count }}, laporan_count: {{ $w->laporan_count }} }; showProfilModal = true" class="text-primary hover:bg-primary/10 p-1.5 rounded-md transition-colors" title="Lihat Profil"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
                             </td>
                         </tr>
                         @empty
@@ -169,8 +169,8 @@
                         <div class="col-span-2">
                             <p class="text-sm text-on-surface-variant mb-1">Ringkasan Riwayat</p>
                             <div class="flex gap-2">
-                                <span class="bg-surface-dim px-3 py-1 rounded text-xs text-on-surface">15 Pesanan Selesai</span>
-                                <span class="bg-surface-dim px-3 py-1 rounded text-xs text-on-surface">3 Laporan Liar</span>
+                                <span class="bg-surface-dim px-3 py-1 rounded text-xs text-on-surface" x-text="selectedWarga.pesanan_count + ' Pesanan Selesai'"></span>
+                                <span class="bg-surface-dim px-3 py-1 rounded text-xs text-on-surface" x-text="selectedWarga.laporan_count + ' Laporan Liar'"></span>
                             </div>
                         </div>
                     </div>

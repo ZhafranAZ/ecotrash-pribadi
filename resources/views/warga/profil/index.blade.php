@@ -85,8 +85,8 @@
                 <input type="file" id="profile_upload" accept="image/*" class="hidden" @change="handleImageUpload">
             </div>
 
-            <h2 class="font-black text-2xl md:text-3xl text-on-surface z-10">{{ $user->nama }}</h2>
-            <p class="text-sm md:text-base font-medium text-on-surface-variant z-10">{{ $user->email }}</p>
+            <h2 class="font-black text-2xl md:text-3xl text-on-surface z-10 text-center w-full break-words px-2">{{ $user->nama }}</h2>
+            <p class="text-sm md:text-base font-medium text-on-surface-variant z-10 text-center w-full">{{ $user->email }}</p>
             <div class="mt-4 flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full text-amber-600 font-bold shadow-sm z-10">
                 <span class="material-symbols-outlined">generating_tokens</span>
                 {{ $user->saldo_koin }} Koin Eco

@@ -22,17 +22,24 @@ class TugasController extends Controller
      */
     public function index(): View
     {
-        $user = auth()->user();
+        $petugas = auth()->user();
 
         // Ambil komplek yang ditugaskan ke petugas ini, beserta jumlah pesanan hari ini
-        $kompleks = $user->petugasKomplek()
+        $kompleks = $petugas->petugasKomplek()
             ->withCount(['pesanan' => function ($query) {
                 $query->where('tanggal_penjemputan', today())
                       ->whereIn('status', ['menunggu', 'diproses']);
             }])
             ->get();
 
-        return view('petugas.beranda', compact('kompleks', 'user'));
+        // Ambil laporan sampah liar aktif yang ditugaskan ke petugas ini
+        $laporanLiar = \App\Models\LaporanSampahLiar::with(['warga', 'komplek'])
+            ->where('petugas_id', $petugas->id)
+            ->whereIn('status', ['disetujui', 'sedang_dibersihkan', 'ditunda'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('petugas.beranda', compact('kompleks', 'petugas', 'laporanLiar'));
     }
 
     /**
@@ -127,7 +134,7 @@ class TugasController extends Controller
                 ]);
 
                 // Tambah koin ke warga
-                CoinService::addCoins($pesanan->warga_id, $jumlahKoin, $pesanan->id);
+                app(CoinService::class)->addCoins($pesanan->warga_id, $jumlahKoin, 'pesanan', $pesanan->id);
 
                 // Catat riwayat status
                 RiwayatStatusPesanan::create([
@@ -285,6 +292,65 @@ class TugasController extends Controller
                 'error'   => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Riwayat tugas petugas — pesanan & laporan yang sudah selesai/kendala.
+     */
+    public function riwayat(): View
+    {
+        $petugas = auth()->user();
+
+        // Pesanan yang sudah selesai atau ada kendala, milik petugas ini
+        $pesananSelesai = PesananPengangkutan::with(['warga', 'komplek'])
+            ->where('petugas_id', $petugas->id)
+            ->whereIn('status', ['selesai', 'hold_kapasitas'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // Laporan sampah liar yang sudah selesai, milik petugas ini
+        $laporanSelesai = \App\Models\LaporanSampahLiar::with(['warga', 'komplek'])
+            ->where('petugas_id', $petugas->id)
+            ->whereIn('status', ['selesai', 'ditolak'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // Summary stats
+        $totalSelesai = $pesananSelesai->where('status', 'selesai')->count()
+                      + $laporanSelesai->where('status', 'selesai')->count();
+        $totalKendala = $pesananSelesai->where('status', 'hold_kapasitas')->count();
+
+        // Group pesanan by komplek
+        $pesananByKomplek = $pesananSelesai->groupBy(function ($p) {
+            return $p->komplek->nama ?? 'Tanpa Komplek';
+        });
+
+        return view('petugas.riwayat', compact(
+            'pesananByKomplek',
+            'laporanSelesai',
+            'totalSelesai',
+            'totalKendala'
+        ));
+    }
+
+    /**
+     * Detail riwayat tugas — pesanan atau laporan.
+     */
+    public function riwayatDetail(string $type, string $id): View
+    {
+        $petugas = auth()->user();
+
+        if ($type === 'pesanan') {
+            $item = PesananPengangkutan::with(['warga', 'komplek', 'riwayatStatus' => function ($q) {
+                $q->orderBy('created_at', 'desc');
+            }])->where('petugas_id', $petugas->id)->findOrFail($id);
+        } else {
+            $item = \App\Models\LaporanSampahLiar::with(['warga', 'komplek'])
+                ->where('petugas_id', $petugas->id)
+                ->findOrFail($id);
+        }
+
+        return view('petugas.riwayat-detail', compact('item', 'type'));
     }
 
     /**

@@ -31,96 +31,90 @@
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Selesai</p>
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary text-[24px]">check_circle</span>
-                        <span class="text-2xl font-black text-on-surface">4</span>
+                        <span class="text-2xl font-black text-on-surface">{{ $totalSelesai }}</span>
                     </div>
                 </div>
                 <div class="bg-surface border border-outline rounded-2xl p-4">
                     <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Kendala</p>
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-orange-500 text-[24px]">warning</span>
-                        <span class="text-2xl font-black text-on-surface">1</span>
+                        <span class="text-2xl font-black text-on-surface">{{ $totalKendala }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- TAB PESANAN -->
             <div x-show="activeTab === 'pesanan'" x-transition.opacity class="space-y-6">
-                <!-- Grup Komplek 1 -->
-                <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <div class="h-6 w-1 bg-primary rounded-full"></div>
-                        <h2 class="font-bold text-sm text-on-surface">Komp. Permata Hijau</h2>
+                @forelse($pesananByKomplek as $namaKomplek => $pesanans)
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="h-6 w-1 bg-primary rounded-full"></div>
+                            <h2 class="font-bold text-sm text-on-surface">{{ $namaKomplek }}</h2>
+                        </div>
+                        <div class="space-y-3">
+                            @foreach($pesanans as $pesanan)
+                                @php
+                                    $isSelesai = $pesanan->status === 'selesai';
+                                    $iconBg = $isSelesai ? 'bg-primary/20' : 'bg-orange-100';
+                                    $iconColor = $isSelesai ? 'text-primary' : 'text-orange-500';
+                                    $icon = $isSelesai ? 'check' : 'report';
+                                    $statusLabel = $isSelesai ? 'Selesai' : 'Hold Kapasitas';
+                                    $statusColor = $isSelesai ? 'text-primary' : 'text-orange-500';
+                                @endphp
+                                <a href="{{ route('petugas.riwayat.detail', ['type' => 'pesanan', 'id' => $pesanan->id]) }}" class="block glass-card rounded-2xl p-4 flex items-center gap-4 hover:scale-[0.99] transition-transform">
+                                    <div class="w-12 h-12 rounded-full {{ $iconBg }} flex items-center justify-center {{ $iconColor }} shrink-0">
+                                        <span class="material-symbols-outlined">{{ $icon }}</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-sm text-on-surface mb-0.5">{{ $pesanan->id }}</p>
+                                        <p class="text-xs text-on-surface-variant line-clamp-1">{{ $pesanan->blok_nomor_rumah ?? $pesanan->nama_alamat_snapshot }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-xs font-bold {{ $statusColor }}">{{ $statusLabel }}</p>
+                                        <p class="text-[10px] text-on-surface-variant mt-0.5">{{ $pesanan->updated_at->format('H:i') }}</p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
                     </div>
-                    <div class="space-y-3">
-                        <!-- Item Riwayat -->
-                        <a href="{{ route('petugas.riwayat.detail', 'INV-0998') }}" class="block glass-card rounded-2xl p-4 flex items-center gap-4 hover:scale-[0.99] transition-transform">
-                            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                                <span class="material-symbols-outlined">check</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-sm text-on-surface mb-0.5">INV-0998</p>
-                                <p class="text-xs text-on-surface-variant line-clamp-1">Kav 4, Blok B</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs font-bold text-primary">Selesai</p>
-                                <p class="text-[10px] text-on-surface-variant mt-0.5">07:45</p>
-                            </div>
-                        </a>
-                        <a href="{{ route('petugas.riwayat.detail', 'INV-0999') }}" class="block glass-card rounded-2xl p-4 flex items-center gap-4 hover:scale-[0.99] transition-transform">
-                            <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 shrink-0">
-                                <span class="material-symbols-outlined">report</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-sm text-on-surface mb-0.5">INV-0999</p>
-                                <p class="text-xs text-on-surface-variant line-clamp-1">Kav 5, Blok C</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs font-bold text-orange-500">Terkunci</p>
-                                <p class="text-[10px] text-on-surface-variant mt-0.5">07:30</p>
-                            </div>
-                        </a>
+                @empty
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[48px] mb-3">inbox</span>
+                        <p class="text-sm font-medium text-on-surface-variant">Belum ada riwayat pesanan</p>
                     </div>
-                </div>
-
-                <!-- Grup Komplek 2 -->
-                <div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <div class="h-6 w-1 bg-primary rounded-full"></div>
-                        <h2 class="font-bold text-sm text-on-surface">Perumahan Asri Indah</h2>
-                    </div>
-                    <div class="space-y-3">
-                        <a href="{{ route('petugas.riwayat.detail', 'INV-1000') }}" class="block glass-card rounded-2xl p-4 flex items-center gap-4 hover:scale-[0.99] transition-transform">
-                            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                                <span class="material-symbols-outlined">check</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-sm text-on-surface mb-0.5">INV-1000</p>
-                                <p class="text-xs text-on-surface-variant line-clamp-1">Jl. Sudirman No 2</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xs font-bold text-primary">Selesai</p>
-                                <p class="text-[10px] text-on-surface-variant mt-0.5">07:15</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                @endforelse
             </div>
 
             <!-- TAB LAPORAN -->
             <div x-show="activeTab === 'laporan'" x-transition.opacity class="space-y-4" style="display: none;">
-                <a href="{{ route('petugas.riwayat.detail', 'LAP-001') }}" class="block glass-card rounded-2xl p-4 flex items-center gap-4 hover:scale-[0.99] transition-transform">
-                    <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                        <span class="material-symbols-outlined">check</span>
+                @forelse($laporanSelesai as $laporan)
+                    @php
+                        $isSelesai = $laporan->status === 'selesai';
+                        $iconBg = $isSelesai ? 'bg-primary/20' : 'bg-red-100';
+                        $iconColor = $isSelesai ? 'text-primary' : 'text-red-500';
+                        $icon = $isSelesai ? 'check' : 'close';
+                        $statusLabel = $isSelesai ? 'Selesai' : 'Ditolak';
+                        $statusColor = $isSelesai ? 'text-primary' : 'text-red-500';
+                    @endphp
+                    <a href="{{ route('petugas.riwayat.detail', ['type' => 'laporan', 'id' => $laporan->id]) }}" class="block glass-card rounded-2xl p-4 flex items-center gap-4 hover:scale-[0.99] transition-transform">
+                        <div class="w-12 h-12 rounded-full {{ $iconBg }} flex items-center justify-center {{ $iconColor }} shrink-0">
+                            <span class="material-symbols-outlined">{{ $icon }}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-sm text-on-surface mb-0.5">LAP-{{ str_pad($laporan->id, 3, '0', STR_PAD_LEFT) }}</p>
+                            <p class="text-xs text-on-surface-variant line-clamp-1">{{ $laporan->alamat_lokasi ?? ($laporan->lat && $laporan->lng ? $laporan->lat . ', ' . $laporan->lng : 'Lokasi tidak tersedia') }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-bold {{ $statusColor }}">{{ $statusLabel }}</p>
+                            <p class="text-[10px] text-on-surface-variant mt-0.5">{{ $laporan->updated_at->format('H:i') }}</p>
+                        </div>
+                    </a>
+                @empty
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[48px] mb-3">inbox</span>
+                        <p class="text-sm font-medium text-on-surface-variant">Belum ada riwayat laporan</p>
                     </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-sm text-on-surface mb-0.5">LAP-001</p>
-                        <p class="text-xs text-on-surface-variant line-clamp-1">Lahan Kosong Depan Minimarket</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs font-bold text-primary">Selesai</p>
-                        <p class="text-[10px] text-on-surface-variant mt-0.5">08:15</p>
-                    </div>
-                </a>
+                @endforelse
             </div>
 
         </div>

@@ -97,7 +97,7 @@ class LaporanLiarController extends Controller
             // Tambahkan koin reward ke warga pelapor
             if ($request->koin_reward > 0) {
                 $this->coinService->addCoins(
-                    $laporan->warga,
+                    $laporan->warga_id,
                     $request->koin_reward,
                     'laporan_liar',
                     (string) $laporan->id

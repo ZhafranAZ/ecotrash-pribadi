@@ -12,9 +12,6 @@ class RiwayatStatusPesanan extends Model
 
     protected $table = 'riwayat_status_pesanan';
 
-    public $timestamps = false;
-
-    const CREATED_AT = 'created_at';
     const UPDATED_AT = null;
 
     protected $fillable = [

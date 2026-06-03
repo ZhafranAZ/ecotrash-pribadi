@@ -24,7 +24,7 @@
         sidebarOpen: false,
         notifOpen: false,
         toast: { show: false, message: '', type: 'success' },
-        showAlert: true,
+        showAlert: {{ $absentPetugasInfo ? 'true' : 'false' }},
         showToast(message, type = 'success') {
             this.toast = { show: true, message, type };
             setTimeout(() => { this.toast.show = false; }, 3500);
@@ -175,11 +175,12 @@
             </div>
         </header>
 
+        @if($absentPetugasInfo)
         <!-- Emergency Alert Banner -->
         <div x-show="showAlert" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="bg-red-600 text-white px-4 lg:px-8 py-2.5 flex items-center justify-between gap-4 z-20" style="display: none;">
             <div class="flex items-center gap-3 min-w-0">
                 <span class="material-symbols-outlined text-[20px] shrink-0 animate-pulse">warning</span>
-                <p class="text-sm font-medium truncate">⚠️ <strong>Petugas Asep Sunandar</strong> berhalangan hari ini — Area <strong>Komplek Cemara Indah</strong> belum memiliki petugas aktif.</p>
+                <p class="text-sm font-medium truncate">⚠️ <strong>Petugas {{ $absentPetugasInfo['nama'] }}</strong> berhalangan hari ini — Area <strong>{{ $absentPetugasInfo['komplek'] }}</strong> belum memiliki petugas aktif.</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
                 <a href="{{ route('admin.operasional.index') }}" class="bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">Tugaskan Ulang</a>
@@ -188,6 +189,7 @@
                 </button>
             </div>
         </div>
+        @endif
 
         <!-- Page Content -->
         <main class="flex-1 overflow-y-auto p-4 lg:p-8">

@@ -151,7 +151,7 @@ class PesananController extends Controller
 
             // 6c. Potong koin (jika dipakai)
             if ($koinDigunakan > 0) {
-                CoinService::deductCoins($user, $koinDigunakan, "Diskon pesanan {$pesanan->id}");
+                app(CoinService::class)->deductCoins($user->id, $koinDigunakan, 'pesanan', $pesanan->id);
             }
 
             // 6d. Kirim notifikasi ke petugas (jika ada yang ter-assign ke komplek)
