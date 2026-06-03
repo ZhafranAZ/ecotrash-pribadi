@@ -78,11 +78,11 @@
         <div class="p-4 border-t border-outline sticky bottom-0 bg-white z-10">
             <div class="flex items-center gap-3 mb-3 px-2">
                 <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                    A
+                    {{ substr(Auth::user()->nama ?? 'A', 0, 1) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-on-surface truncate">Super Admin</p>
-                    <p class="text-xs text-on-surface-variant truncate">admin@ecotrash.com</p>
+                    <p class="text-sm font-semibold text-on-surface truncate">{{ Auth::user()->nama ?? 'Admin' }}</p>
+                    <p class="text-xs text-on-surface-variant truncate">{{ Auth::user()->email }}</p>
                 </div>
             </div>
             <a href="{{ route('admin.profil.index') }}" class="w-full flex items-center justify-center gap-2 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors text-sm font-medium mb-1">
@@ -120,56 +120,48 @@
                 <div class="relative" x-data @click.outside="notifOpen = false">
                     <button @click="notifOpen = !notifOpen" class="relative p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">
                         <span class="material-symbols-outlined">notifications</span>
-                        <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                        @if($unreadCount > 0)
+                            <span class="absolute -top-1 -right-1 min-w-[20px] h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white px-1">{{ $unreadCount }}</span>
+                        @endif
                     </button>
 
                     <!-- Notification Dropdown -->
                     <div x-show="notifOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-outline shadow-xl z-50" style="display: none;">
                         <div class="p-4 border-b border-outline flex items-center justify-between">
                             <h4 class="font-bold text-on-surface text-sm">Notifikasi</h4>
-                            <span class="text-xs text-primary font-medium cursor-pointer hover:underline">Tandai semua dibaca</span>
+                            <form method="POST" action="{{ route('notifikasi.markAllRead') }}" class="inline">
+                                @csrf
+                                <button type="submit" class="text-xs text-primary font-medium cursor-pointer hover:underline">Tandai semua dibaca</button>
+                            </form>
                         </div>
                         <div class="divide-y divide-outline max-h-72 overflow-y-auto">
-                            <div class="p-4 flex items-start gap-3 hover:bg-surface-dim transition-colors bg-primary/5">
-                                <div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
-                                    <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                            @forelse($unreadNotifications as $notif)
+                                <div class="p-4 flex items-start gap-3 hover:bg-surface-dim transition-colors {{ !$notif->is_read ? 'bg-primary/5' : '' }}">
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5
+                                        @if($notif->tipe === 'success') bg-green-50 text-green-600
+                                        @elseif($notif->tipe === 'warning') bg-yellow-50 text-yellow-600
+                                        @elseif($notif->tipe === 'error') bg-red-50 text-red-600
+                                        @else bg-primary/10 text-primary
+                                        @endif">
+                                        <span class="material-symbols-outlined text-[18px]">
+                                            @if($notif->tipe === 'success') check_circle
+                                            @elseif($notif->tipe === 'warning') warning
+                                            @elseif($notif->tipe === 'error') cancel
+                                            @else info
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-on-surface font-medium">{{ $notif->judul }}</p>
+                                        <p class="text-xs text-on-surface-variant mt-0.5">{{ Str::limit($notif->pesan, 60) }}</p>
+                                        <p class="text-xs text-primary mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="text-sm text-on-surface font-medium">Pesanan baru masuk</p>
-                                    <p class="text-xs text-on-surface-variant mt-0.5">Budi Santoso — Komplek Bunga Asri</p>
-                                    <p class="text-xs text-primary mt-1">2 menit lalu</p>
+                            @empty
+                                <div class="p-6 text-center">
+                                    <p class="text-sm text-on-surface-variant">Belum ada notifikasi.</p>
                                 </div>
-                            </div>
-                            <div class="p-4 flex items-start gap-3 hover:bg-surface-dim transition-colors bg-primary/5">
-                                <div class="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 shrink-0 mt-0.5">
-                                    <span class="material-symbols-outlined text-[18px]">report</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-on-surface font-medium">Laporan baru menunggu verifikasi</p>
-                                    <p class="text-xs text-on-surface-variant mt-0.5">Siti Aminah — Lahan Blok C</p>
-                                    <p class="text-xs text-primary mt-1">15 menit lalu</p>
-                                </div>
-                            </div>
-                            <div class="p-4 flex items-start gap-3 hover:bg-surface-dim transition-colors">
-                                <div class="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center text-green-600 shrink-0 mt-0.5">
-                                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-on-surface font-medium">Tugas petugas selesai</p>
-                                    <p class="text-xs text-on-surface-variant mt-0.5">Jajang Suryana — 12 resi diselesaikan</p>
-                                    <p class="text-xs text-on-surface-variant mt-1">1 jam lalu</p>
-                                </div>
-                            </div>
-                            <div class="p-4 flex items-start gap-3 hover:bg-surface-dim transition-colors">
-                                <div class="w-9 h-9 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant shrink-0 mt-0.5">
-                                    <span class="material-symbols-outlined text-[18px]">article</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-on-surface font-medium">Artikel "Daur Ulang Plastik" diterbitkan</p>
-                                    <p class="text-xs text-on-surface-variant mt-0.5">Oleh Super Admin</p>
-                                    <p class="text-xs text-on-surface-variant mt-1">3 jam lalu</p>
-                                </div>
-                            </div>
+                            @endforelse
                         </div>
                         <div class="p-3 text-center border-t border-outline">
                             <a href="{{ route('admin.notifikasi.index') }}" class="text-sm text-primary font-medium hover:underline">Lihat semua notifikasi</a>

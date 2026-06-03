@@ -1,4 +1,4 @@
-@props(['id', 'type', 'time', 'address', 'note' => null])
+@props(['id', 'type', 'time', 'address', 'note' => null, 'kategori' => null, 'nama_warga' => null])
 
 <a href="{{ route('petugas.tugas.detail', ['type' => $type, 'id' => $id]) }}" class="block glass-card rounded-3xl p-5 active:scale-[0.98] transition-transform">
     <div class="flex items-start gap-4">
@@ -12,13 +12,24 @@
         <!-- Card Content -->
         <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between mb-1">
-                <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                    Angkut Sampah
-                </span>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        Angkut Sampah
+                    </span>
+                    @if($kategori)
+                    <span class="text-[10px] font-bold text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded-md">
+                        {{ ucfirst($kategori) }}
+                    </span>
+                    @endif
+                </div>
                 <span class="text-xs font-bold text-on-surface-variant">{{ $id }}</span>
             </div>
             
             <h3 class="text-base font-bold text-on-surface mb-1 truncate">{{ $address }}</h3>
+
+            @if($nama_warga)
+            <p class="text-xs font-medium text-on-surface-variant mb-1">{{ $nama_warga }}</p>
+            @endif
             
             @if($note)
             <div class="flex items-start gap-1 text-orange-500 mb-3">

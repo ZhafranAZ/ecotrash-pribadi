@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Warga\PesananController;
+use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
+use App\Http\Controllers\Warga\AktivitasController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 // Landing page
 Route::get('/', function () {
@@ -23,17 +27,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/setup-address', [RegisteredUserController::class, 'showSetupAddress'])->name('setup-address');
     Route::post('/setup-address', [RegisteredUserController::class, 'storeAddress'])->name('setup-address.post');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    // --- Notifikasi (Global, semua role yang login) ---
+    Route::post('/notifikasi/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])
+        ->name('notifikasi.markAllRead');
 });
 
 // --- Warga Routes ---
 Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'address.setup'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('warga.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [WargaDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/pesanan/{id}/bayar-selisih', [WargaDashboardController::class, 'bayarSelisih'])->name('pesanan.bayar_selisih');
 
-    Route::get('/aktivitas', function () {
-        return view('warga.aktivitas.index');
-    })->name('aktivitas.index');
+    Route::get('/aktivitas', [AktivitasController::class, 'index'])->name('aktivitas.index');
 
     Route::get('/edukasi', function () {
         return view('warga.edukasi.index');
@@ -57,13 +62,9 @@ Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'addre
     Route::get('/pesan/berhasil/{id}', [PesananController::class, 'success'])->name('pesan.berhasil');
 
     // Lapor
-    Route::get('/lapor/create', function () {
-        return view('warga.lapor.create');
-    })->name('lapor.create');
-
-    Route::get('/lapor/berhasil', function () {
-        return view('warga.lapor.berhasil');
-    })->name('lapor.berhasil');
+    Route::get('/lapor/create', [LaporanController::class, 'create'])->name('lapor.create');
+    Route::post('/lapor', [LaporanController::class, 'store'])->name('lapor.store');
+    Route::get('/lapor/berhasil', [LaporanController::class, 'berhasil'])->name('lapor.berhasil');
 
     Route::get('/bantuan', function () {
         return view('warga.bantuan');
@@ -76,17 +77,15 @@ Route::get('/home', function () {
 
 // --- Admin Routes ---
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/laporan', function () {
-        return view('admin.laporan.index');
-    })->name('laporan.index');
+    Route::get('/laporan', [LaporanLiarController::class, 'index'])->name('laporan.index');
+    Route::post('/laporan/{id}/approve', [LaporanLiarController::class, 'approve'])->name('laporan.approve');
+    Route::post('/laporan/{id}/reject', [LaporanLiarController::class, 'reject'])->name('laporan.reject');
+    Route::post('/laporan/{id}/duplicate', [LaporanLiarController::class, 'markDuplicate'])->name('laporan.duplicate');
 
-    Route::get('/operasional', function () {
-        return view('admin.operasional.index');
-    })->name('operasional.index');
+    Route::get('/operasional', [OperasionalController::class, 'index'])->name('operasional.index');
+    Route::post('/operasional/assign-petugas', [OperasionalController::class, 'assignPetugas'])->name('operasional.assignPetugas');
 
     Route::get('/pengguna', function () {
         return view('admin.pengguna.index');
@@ -115,21 +114,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
 // --- Petugas Routes ---
 Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/beranda', function () {
-        return view('petugas.beranda');
-    })->name('beranda');
+    Route::get('/beranda', [TugasController::class, 'index'])->name('beranda');
 
-    Route::get('/komplek/{id}/warga', function ($id) {
-        return view('petugas.komplek.warga', ['id' => $id]);
-    })->name('komplek.warga');
+    Route::get('/komplek/{id}/warga', [TugasController::class, 'showKomplekWarga'])->name('komplek.warga');
 
     Route::get('/laporan/{id}', function ($id) {
         return view('petugas.laporan.detail', ['id' => $id]);
     })->name('laporan.detail');
 
-    Route::get('/tugas/{type}/{id}', function ($type, $id) {
-        return view('petugas.tugas.detail');
-    })->name('tugas.detail');
+    Route::get('/tugas/{type}/{id}', [TugasController::class, 'showDetail'])->name('tugas.detail');
+
+    // API routes untuk Axios (update status & lapor kendala)
+    Route::post('/tugas/{id}/status', [TugasController::class, 'updateStatus'])->name('tugas.updateStatus');
+    Route::post('/tugas/{id}/kendala', [TugasController::class, 'reportKendala'])->name('tugas.reportKendala');
 
     Route::get('/riwayat', function () {
         return view('petugas.riwayat');
