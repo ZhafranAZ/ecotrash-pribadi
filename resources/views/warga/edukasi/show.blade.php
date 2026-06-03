@@ -2,6 +2,83 @@
 
 @section('title', 'Baca Artikel')
 
+@push('styles')
+<style>
+    .ql-align-center { text-align: center; }
+    .ql-align-right { text-align: right; }
+    .ql-align-justify { text-align: justify; }
+    .ql-align-left { text-align: left; }
+    
+    /* Pindahkan list counter reset ke root pembaca agar angka berlanjut meskipun ada paragraf di tengah */
+    article.prose {
+        counter-reset: list-0-decimal list-0-alpha list-0-uppercase list-0-roman list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9 !important;
+    }
+    article.prose ol {
+        counter-reset: none !important;
+    }
+    
+    /* 1. Aturan Rendering untuk Huruf Kecil (a, b, c) */
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-alpha {
+        counter-increment: list-0-alpha !important;
+    }
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-alpha::before {
+        content: counter(list-0-alpha, lower-alpha) ". " !important;
+    }
+
+    /* 2. Aturan Rendering untuk Huruf Kapital (A, B, C) */
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-uppercase {
+        counter-increment: list-0-uppercase !important;
+    }
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-uppercase::before {
+        content: counter(list-0-uppercase, upper-alpha) ". " !important;
+    }
+
+    /* 3. Aturan Rendering untuk Romawi Kecil (i, ii, iii) */
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-roman {
+        counter-increment: list-0-roman !important;
+    }
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-roman::before {
+        content: counter(list-0-roman, lower-roman) ". " !important;
+    }
+
+    /* 4. Aturan Rendering untuk Angka Desimal Eksplisit (1, 2, 3) */
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-decimal {
+        counter-increment: list-0-decimal !important;
+        counter-set: list-0-alpha 0 list-0-uppercase 0 list-0-roman 0 !important;
+    }
+    article.prose ol li:not([class*="ql-indent-"]).ql-list-style-decimal::before {
+        content: counter(list-0-decimal, decimal) ". " !important;
+    }
+
+    /* 5. Aturan Rendering untuk Angka Desimal Default (Tanpa class kustom) */
+    article.prose ol li:not([class*="ql-indent-"]):not([class*="ql-list-style-"]) {
+        counter-increment: list-0-decimal !important;
+        counter-set: list-0-alpha 0 list-0-uppercase 0 list-0-roman 0 !important;
+    }
+    article.prose ol li:not([class*="ql-indent-"]):not([class*="ql-list-style-"])::before {
+        content: counter(list-0-decimal, decimal) ". " !important;
+    }
+
+    /* Dukungan Indentasi dan Penomoran Quill untuk Warga */
+    article.prose li.ql-indent-1 {
+        padding-left: 2em !important;
+        counter-reset: list-2 !important;
+    }
+    article.prose li.ql-indent-1::before {
+        content: counter(list-1, lower-alpha) ". " !important;
+        counter-increment: list-1;
+    }
+    article.prose li.ql-indent-2 {
+        padding-left: 4em !important;
+        counter-reset: list-3 !important;
+    }
+    article.prose li.ql-indent-2::before {
+        content: counter(list-2, lower-roman) ". " !important;
+        counter-increment: list-2;
+    }
+</style>
+@endpush
+
 @section('header')
 <div class="flex items-center gap-3 w-full">
     <button onclick="history.back()" class="p-2 -ml-2 rounded-full hover:bg-surface-variant text-on-surface-variant transition-colors">

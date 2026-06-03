@@ -27,6 +27,76 @@
         border-radius: 0.5rem;
         box-shadow: 0 0 0 1px var(--color-primary);
     }
+    /* Fix Quill tooltip positioning and z-index */
+    .ql-snow .ql-tooltip {
+        z-index: 100 !important;
+    }
+    /* Pindahkan list counter reset ke root editor agar angka berlanjut meskipun ada paragraf di tengah */
+    .ql-editor {
+        counter-reset: list-0-decimal list-0-alpha list-0-uppercase list-0-roman list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9 !important;
+    }
+    .ql-editor ol {
+        counter-reset: none !important;
+    }
+    /* Styling Dropdown Label & Item di Toolbar */
+    .ql-snow .ql-picker.ql-list-style {
+        width: 110px;
+    }
+    .ql-snow .ql-picker.ql-list-style .ql-picker-label::before,
+    .ql-snow .ql-picker.ql-list-style .ql-picker-item::before {
+        content: '1, 2, 3';
+    }
+    .ql-snow .ql-picker.ql-list-style .ql-picker-label[data-value="alpha"]::before,
+    .ql-snow .ql-picker.ql-list-style .ql-picker-item[data-value="alpha"]::before {
+        content: 'a, b, c';
+    }
+    .ql-snow .ql-picker.ql-list-style .ql-picker-label[data-value="uppercase"]::before,
+    .ql-snow .ql-picker.ql-list-style .ql-picker-item[data-value="uppercase"]::before {
+        content: 'A, B, C';
+    }
+    .ql-snow .ql-picker.ql-list-style .ql-picker-label[data-value="roman"]::before,
+    .ql-snow .ql-picker.ql-list-style .ql-picker-item[data-value="roman"]::before {
+        content: 'i, ii, iii';
+    }
+
+    /* Rendering Penomoran Huruf & Romawi di Editor (Tingkat Pertama Saja) */
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-alpha {
+        counter-increment: list-0-alpha !important;
+    }
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-alpha::before {
+        content: counter(list-0-alpha, lower-alpha) ". " !important;
+    }
+
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-uppercase {
+        counter-increment: list-0-uppercase !important;
+    }
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-uppercase::before {
+        content: counter(list-0-uppercase, upper-alpha) ". " !important;
+    }
+
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-roman {
+        counter-increment: list-0-roman !important;
+    }
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-roman::before {
+        content: counter(list-0-roman, lower-roman) ". " !important;
+    }
+
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-decimal {
+        counter-increment: list-0-decimal !important;
+        counter-set: list-0-alpha 0 list-0-uppercase 0 list-0-roman 0 !important;
+    }
+    .ql-editor ol li:not([class*="ql-indent-"]).ql-list-style-decimal::before {
+        content: counter(list-0-decimal, decimal) ". " !important;
+    }
+
+    /* Default decimal list item (no custom class, no indent class) di Editor */
+    .ql-editor ol li:not([class*="ql-indent-"]):not([class*="ql-list-style-"]) {
+        counter-increment: list-0-decimal !important;
+        counter-set: list-0-alpha 0 list-0-uppercase 0 list-0-roman 0 !important;
+    }
+    .ql-editor ol li:not([class*="ql-indent-"]):not([class*="ql-list-style-"])::before {
+        content: counter(list-0-decimal, decimal) ". " !important;
+    }
 </style>
 @endpush
 
@@ -129,6 +199,13 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Register custom list style class attributor
+        var Parchment = Quill.import('parchment');
+        var ListStyle = new Parchment.Attributor.Class('list-style', 'ql-list-style', {
+            scope: Parchment.Scope.BLOCK
+        });
+        Quill.register(ListStyle, true);
+
         var quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Mulai menulis konten edukasi di sini...',
@@ -137,6 +214,9 @@
                     [{ 'header': [2, 3, false] }],
                     ['bold', 'italic', 'underline', 'strike'],
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'list-style': ['decimal', 'alpha', 'uppercase', 'roman'] }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'align': [] }],
                     ['link', 'image', 'video'],
                     ['clean']
                 ]
