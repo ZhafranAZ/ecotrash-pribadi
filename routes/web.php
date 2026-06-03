@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Petugas\TugasController;
-use App\Http\Controllers\Admin\OperasionalController;
+use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
+use App\Http\Controllers\Warga\AktivitasController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 // Landing page
 Route::get('/', function () {
@@ -24,17 +26,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/setup-address', [RegisteredUserController::class, 'showSetupAddress'])->name('setup-address');
     Route::post('/setup-address', [RegisteredUserController::class, 'storeAddress'])->name('setup-address.post');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    // --- Notifikasi (Global, semua role yang login) ---
+    Route::post('/notifikasi/mark-all-as-read', [NotifikasiController::class, 'markAllAsRead'])
+        ->name('notifikasi.markAllRead');
 });
 
 // --- Warga Routes ---
 Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'address.setup'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('warga.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [WargaDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/pesanan/{id}/bayar-selisih', [WargaDashboardController::class, 'bayarSelisih'])->name('pesanan.bayar_selisih');
 
-    Route::get('/aktivitas', function () {
-        return view('warga.aktivitas.index');
-    })->name('aktivitas.index');
+    Route::get('/aktivitas', [AktivitasController::class, 'index'])->name('aktivitas.index');
 
     Route::get('/edukasi', function () {
         return view('warga.edukasi.index');
@@ -81,9 +84,7 @@ Route::get('/home', function () {
 
 // --- Admin Routes ---
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/laporan', function () {
         return view('admin.laporan.index');

@@ -7,14 +7,21 @@ use App\Models\Komplek;
 use App\Models\AlamatWarga;
 use App\Models\PengaturanSistem;
 use App\Models\PesananPengangkutan;
+use App\Models\RiwayatStatusPesanan;
+use App\Models\LaporanSampahLiar;
+use App\Models\Notifikasi;
+use App\Models\RiwayatKoin;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // =============================================
         // 1. Create 2 Komplek
+        // =============================================
         $komplek1 = Komplek::create([
             'nama_komplek' => 'Perumahan Asri Indah',
             'lat' => -6.9175000,
@@ -27,7 +34,9 @@ class DatabaseSeeder extends Seeder
             'lng' => 107.6350000,
         ]);
 
+        // =============================================
         // 2. Create 3 Users (password: 'password' for all)
+        // =============================================
         $admin = User::create([
             'nama' => 'Admin EcoTrash',
             'email' => 'admin@ecotrash.id',
@@ -90,7 +99,9 @@ class DatabaseSeeder extends Seeder
         // $petugas->petugasKomplek()->attach([$komplek1->id]);
         // $petugas2->petugasKomplek()->attach([$komplek2->id]);
 
+        // =============================================
         // 5. Create default PengaturanSistem
+        // =============================================
         PengaturanSistem::create([
             'konversi_koin_rupiah' => 500,
             'harga_kategori_kecil' => 15000,

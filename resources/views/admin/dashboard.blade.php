@@ -19,8 +19,8 @@
             <span class="material-symbols-outlined text-[28px]">group</span>
         </div>
         <div>
-            <p class="text-sm font-medium text-on-surface-variant">Total Warga</p>
-            <p class="text-2xl font-bold text-on-surface">1,248</p>
+            <p class="text-sm font-medium text-on-surface-variant">Total Warga & Petugas</p>
+            <p class="text-2xl font-bold text-on-surface">{{ number_format($totalWarga + $totalPetugas) }}</p>
         </div>
     </div>
     
@@ -30,7 +30,7 @@
         </div>
         <div>
             <p class="text-sm font-medium text-on-surface-variant">Pesanan Hari Ini</p>
-            <p class="text-2xl font-bold text-on-surface">45</p>
+            <p class="text-2xl font-bold text-on-surface">{{ number_format($pesananHariIni) }}</p>
         </div>
     </div>
     
@@ -40,7 +40,7 @@
         </div>
         <div>
             <p class="text-sm font-medium text-on-surface-variant">Laporan Pending</p>
-            <p class="text-2xl font-bold text-on-surface">12</p>
+            <p class="text-2xl font-bold text-on-surface">{{ number_format($laporanMenunggu) }}</p>
         </div>
     </div>
     
@@ -50,7 +50,7 @@
         </div>
         <div>
             <p class="text-sm font-medium text-on-surface-variant">Koin Beredar</p>
-            <p class="text-2xl font-bold text-on-surface">54,300</p>
+            <p class="text-2xl font-bold text-on-surface">{{ number_format($koinBeredar) }}</p>
         </div>
     </div>
 </div>
@@ -104,13 +104,8 @@
             maxZoom: 20
         }).addTo(map);
 
-        // Dummy Markers
-        const markers = [
-            { lat: -6.915, lng: 107.610, type: 'tps', title: 'TPS Komplek A' },
-            { lat: -6.912, lng: 107.605, type: 'tps', title: 'TPS Komplek B' },
-            { lat: -6.918, lng: 107.615, type: 'liar', title: 'Laporan: Sampah di selokan' },
-            { lat: -6.920, lng: 107.608, type: 'liar', title: 'Laporan: Tumpukan di lahan kosong' },
-        ];
+        // Map Markers from Controller
+        const markers = @json($mapMarkers);
 
         // Custom Icons
         const tpsIcon = L.divIcon({
@@ -148,10 +143,10 @@
         new Chart(ctxPesanan, {
             type: 'line',
             data: {
-                labels: ['1 Mei', '5 Mei', '10 Mei', '15 Mei', '20 Mei', '25 Mei', '30 Mei'],
+                labels: @json($chartPesanan['labels']),
                 datasets: [{
                     label: 'Pesanan Selesai',
-                    data: [12, 19, 15, 25, 22, 30, 45],
+                    data: @json($chartPesanan['data']),
                     borderColor: primaryColor,
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     tension: 0.4,
@@ -174,10 +169,10 @@
         new Chart(ctxLaporan, {
             type: 'bar',
             data: {
-                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+                labels: @json($chartLaporan['labels']),
                 datasets: [{
                     label: 'Laporan Masuk',
-                    data: [8, 12, 5, 15],
+                    data: @json($chartLaporan['data']),
                     backgroundColor: redColor,
                     borderRadius: 4
                 }]
