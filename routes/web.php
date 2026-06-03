@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Warga\ProfilController;
+use App\Http\Controllers\Admin\PenggunaController;
+use App\Http\Controllers\Admin\KomplekController;
 use App\Http\Controllers\Warga\PesananController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
@@ -45,9 +48,13 @@ Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'addre
     Route::get('/edukasi/{id}', [App\Http\Controllers\Warga\EdukasiWargaController::class, 'show'])->name('edukasi.show');
     Route::post('/edukasi/{id}/bookmark', [App\Http\Controllers\Warga\EdukasiWargaController::class, 'toggleBookmark'])->name('edukasi.bookmark');
 
-    Route::get('/profil', function () {
-        return view('warga.profil.index');
-    })->name('profil.index');
+    // Profil & Alamat (MODUL 2)
+    Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
+    Route::put('/profil/update', [ProfilController::class, 'updateProfile'])->name('profil.update');
+    Route::post('/profil/alamat', [ProfilController::class, 'storeAlamat'])->name('profil.alamat.store');
+    Route::put('/profil/alamat/{id}', [ProfilController::class, 'updateAlamat'])->name('profil.alamat.update');
+    Route::put('/profil/alamat/{id}/utama', [ProfilController::class, 'setAlamatUtama'])->name('profil.alamat.utama');
+    Route::delete('/profil/alamat/{id}', [ProfilController::class, 'destroyAlamat'])->name('profil.alamat.destroy');
 
     // Pesan
     Route::get('/pesan/create', [PesananController::class, 'create'])->name('pesan.create');
@@ -80,15 +87,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/operasional', [OperasionalController::class, 'index'])->name('operasional.index');
     Route::post('/operasional/assign-petugas', [OperasionalController::class, 'assignPetugas'])->name('operasional.assignPetugas');
 
-    Route::get('/pengguna', function () {
-        return view('admin.pengguna.index');
-    })->name('pengguna.index');
+    // Pengguna (MODUL 2)
+    Route::get('/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
+    Route::post('/pengguna/petugas', [PenggunaController::class, 'storePetugas'])->name('pengguna.petugas.store');
+    Route::put('/pengguna/petugas/{id}', [PenggunaController::class, 'updatePetugas'])->name('pengguna.petugas.update');
+    Route::delete('/pengguna/petugas/{id}', [PenggunaController::class, 'destroyPetugas'])->name('pengguna.petugas.destroy');
 
     Route::resource('edukasi', App\Http\Controllers\Admin\EdukasiController::class);
 
-    Route::get('/pengaturan', function () {
-        return view('admin.pengaturan.index');
-    })->name('pengaturan.index');
+    // Pengaturan Komplek (MODUL 2)
+    Route::get('/pengaturan', [KomplekController::class, 'index'])->name('pengaturan.index');
+    Route::post('/pengaturan/komplek', [KomplekController::class, 'store'])->name('pengaturan.komplek.store');
+    Route::put('/pengaturan/komplek/{id}', [KomplekController::class, 'update'])->name('pengaturan.komplek.update');
+    Route::delete('/pengaturan/komplek/{id}', [KomplekController::class, 'destroy'])->name('pengaturan.komplek.destroy');
 
     Route::get('/profil', function () {
         return view('admin.profil.index');
