@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Petugas\TindakLanjutController;
 
 // Landing page
 Route::get('/', function () {
@@ -118,17 +119,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
 // --- Petugas Routes ---
 Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/beranda', function () {
-        return view('petugas.beranda');
-    })->name('beranda');
+    Route::get('/beranda', [TindakLanjutController::class, 'beranda'])->name('beranda');
 
     Route::get('/komplek/{id}/warga', function ($id) {
         return view('petugas.komplek.warga', ['id' => $id]);
     })->name('komplek.warga');
 
-    Route::get('/laporan/{id}', function ($id) {
-        return view('petugas.laporan.detail', ['id' => $id]);
-    })->name('laporan.detail');
+    Route::get('/laporan/{id}', [TindakLanjutController::class, 'show'])->name('laporan.detail');
+    Route::post('/laporan/{id}/mulai', [TindakLanjutController::class, 'mulai'])->name('laporan.mulai');
+    Route::post('/laporan/{id}/tunda', [TindakLanjutController::class, 'tunda'])->name('laporan.tunda');
+    Route::post('/laporan/{id}/selesai', [TindakLanjutController::class, 'selesai'])->name('laporan.selesai');
 
     Route::get('/tugas/{type}/{id}', function ($type, $id) {
         return view('petugas.tugas.detail');

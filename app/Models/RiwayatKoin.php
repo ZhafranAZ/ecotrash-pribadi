@@ -19,6 +19,7 @@ class RiwayatKoin extends Model
         'sumber',
         'referensi_id',
         'expired_at',
+        'is_processed',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class RiwayatKoin extends Model
         return [
             'expired_at' => 'datetime',
             'jumlah' => 'integer',
+            'is_processed' => 'boolean',
         ];
     }
 
