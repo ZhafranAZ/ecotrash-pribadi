@@ -8,6 +8,22 @@ use App\Models\User;
 class NotificationService
 {
     /**
+     * Kirim notifikasi ke user.
+     *
+     * @param int    $userId ID user penerima notifikasi
+     * @param string $judul  Judul notifikasi
+     * @param string $pesan  Isi pesan notifikasi
+     * @param string $tipe   Tipe notifikasi: 'info', 'warning', 'success', 'error'
+     * @return Notifikasi Record notifikasi yang dibuat
+     */
+    public function send(int $userId, string $judul, string $pesan, string $tipe = 'info'): Notifikasi
+    {
+        // Validasi tipe notifikasi
+        $allowedTypes = ['info', 'warning', 'success', 'error'];
+        if (!in_array($tipe, $allowedTypes)) {
+            $tipe = 'info';
+        }
+
      * Kirim notifikasi ke user tertentu.
      * Digunakan oleh modul lain (3, 4, 5, 6) sebagai "Tukang Pos" terpusat.
      *
