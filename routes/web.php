@@ -90,9 +90,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         return view('admin.laporan.index');
     })->name('laporan.index');
 
-    Route::get('/operasional', function () {
-        return view('admin.operasional.index');
-    })->name('operasional.index');
+    Route::get('/operasional', [OperasionalController::class, 'index'])->name('operasional.index');
+    Route::post('/operasional/assign-petugas', [OperasionalController::class, 'assignPetugas'])->name('operasional.assignPetugas');
 
     Route::get('/pengguna', function () {
         return view('admin.pengguna.index');
@@ -121,21 +120,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
 // --- Petugas Routes ---
 Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])->group(function () {
-    Route::get('/beranda', function () {
-        return view('petugas.beranda');
-    })->name('beranda');
+    Route::get('/beranda', [TugasController::class, 'index'])->name('beranda');
 
-    Route::get('/komplek/{id}/warga', function ($id) {
-        return view('petugas.komplek.warga', ['id' => $id]);
-    })->name('komplek.warga');
+    Route::get('/komplek/{id}/warga', [TugasController::class, 'showKomplekWarga'])->name('komplek.warga');
 
     Route::get('/laporan/{id}', function ($id) {
         return view('petugas.laporan.detail', ['id' => $id]);
     })->name('laporan.detail');
 
-    Route::get('/tugas/{type}/{id}', function ($type, $id) {
-        return view('petugas.tugas.detail');
-    })->name('tugas.detail');
+    Route::get('/tugas/{type}/{id}', [TugasController::class, 'showDetail'])->name('tugas.detail');
+
+    // API routes untuk Axios (update status & lapor kendala)
+    Route::post('/tugas/{id}/status', [TugasController::class, 'updateStatus'])->name('tugas.updateStatus');
+    Route::post('/tugas/{id}/kendala', [TugasController::class, 'reportKendala'])->name('tugas.reportKendala');
 
     Route::get('/riwayat', function () {
         return view('petugas.riwayat');
