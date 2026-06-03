@@ -1,15 +1,19 @@
 <x-petugas-layout :hideNav="true">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <div x-data="{ 
         showKendala: false,
         kendalaType: '',
         isDone: false,
         showConfirmSelesai: false,
         imagePreview: null,
-        status: 'menunggu' // 'menunggu' -> 'diproses' -> 'selesai' -> 'dibatalkan'
+        status: '{{ $pesanan->status }}', // 'menunggu' -> 'diproses' -> 'selesai' -> 'dibatalkan' -> 'dijadwalkan_ulang' -> 'hold_kapasitas'
+        pesananId: '{{ $pesanan->id }}',
+        isLoading: false,
+        newScheduleDate: ''
     }">
         
-        <!-- MAIN CONTENT (Tampil jika belum selesai/batal) -->
-        <div x-show="status !== 'selesai' && status !== 'dibatalkan'">
+        <!-- MAIN CONTENT (Tampil jika belum selesai/batal/reschedule) -->
+        <div x-show="status !== 'selesai' && status !== 'dibatalkan' && status !== 'dijadwalkan_ulang' && status !== 'hold_kapasitas'">
             <!-- Header -->
             <header class="bg-surface border-b border-outline px-4 pt-6 pb-4 sticky top-0 z-30 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -18,7 +22,7 @@
                 </a>
                 <div>
                     <h1 class="text-lg font-black text-on-surface leading-tight">Detail Tugas</h1>
-                    <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">{{ $id ?? 'INV-1001' }}</p>
+                    <p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">{{ $pesanan->id }}</p>
                 </div>
             </div>
         </header>
@@ -33,11 +37,11 @@
                     </div>
                     <div class="flex-1">
                         <p class="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md inline-block mb-1">Angkut Sampah</p>
-                        <h2 class="text-lg font-black text-on-surface leading-tight">Jl. Merdeka No. 45, Blok C</h2>
-                        <p class="text-xs font-bold text-on-surface-variant mt-0.5 italic">{{ $detail_patokan ?? 'Pagar Hitam, Depan Warung' }}</p>
-                        <p class="text-sm font-medium text-on-surface mt-2">Bpk. Budi Santoso</p>
+                        <h2 class="text-lg font-black text-on-surface leading-tight">{{ $pesanan->nama_alamat_snapshot }}, {{ $pesanan->blok_nomor_rumah }}</h2>
+                        <p class="text-xs font-bold text-on-surface-variant mt-0.5 italic">{{ $pesanan->detail_patokan_snapshot ?? '' }}</p>
+                        <p class="text-sm font-medium text-on-surface mt-2">{{ $pesanan->warga->nama }}</p>
                     </div>
-                    <a href="tel:08123456789" class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors">
+                    <a href="tel:{{ $pesanan->warga->no_telepon }}" class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:bg-primary/20 transition-colors">
                         <span class="material-symbols-outlined text-[20px]">call</span>
                     </a>
                 </div>
@@ -46,7 +50,7 @@
                     <span class="material-symbols-outlined text-orange-500 text-[18px] shrink-0 mt-0.5">description</span>
                     <div>
                         <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider mb-0.5">Catatan Pesanan</p>
-                        <p class="text-xs font-bold text-on-surface-variant leading-relaxed">{{ $catatan_warga ?? 'Tolong panggil nomor rumah jika pagar dikunci. Anjing penjaga sudah diikat.' }}</p>
+                        <p class="text-xs font-bold text-on-surface-variant leading-relaxed">{{ $pesanan->catatan_warga ?? 'Tidak ada catatan.' }}</p>
                     </div>
                 </div>
             </div>
@@ -73,7 +77,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="file" accept="image/*" capture="environment" class="hidden" @change="if($event.target.files.length) imagePreview = URL.createObjectURL($event.target.files[0])">
+                        <input type="file" accept="image/*" capture="environment" class="hidden" x-ref="fotoBukti" @change="if($event.target.files.length) imagePreview = URL.createObjectURL($event.target.files[0])">
                     </label>
                 </div>
 
@@ -99,9 +103,18 @@
         <!-- Sticky Bottom Actions -->
         <div class="fixed bottom-0 w-full max-w-md mx-auto bg-surface border-t-2 border-outline p-4 pb-safe z-40 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
             <!-- State 1: Start Process -->
-            <button x-show="status === 'menunggu'" @click="status = 'diproses'" class="w-full bg-primary text-white font-bold py-4 mb-4 rounded-2xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98]">
+            <button x-show="status === 'menunggu'" 
+                @click="
+                    isLoading = true;
+                    axios.post('/petugas/tugas/' + pesananId + '/status', { status: 'diproses' }, {
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }
+                    }).then(r => { status = r.data.status; isLoading = false; })
+                    .catch(e => { alert(e.response?.data?.message || 'Gagal memproses'); isLoading = false; })
+                " 
+                :disabled="isLoading"
+                class="w-full bg-primary text-white font-bold py-4 mb-4 rounded-2xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50">
                 <span class="material-symbols-outlined">directions_car</span>
-                Proses Pesanan (Otw)
+                <span x-text="isLoading ? 'Memproses...' : 'Proses Pesanan (Otw)'"></span>
             </button>
             
             <!-- State 2: Finish Button (Replacing Swipe) -->
@@ -121,7 +134,7 @@
             <h2 class="text-2xl font-black text-on-surface mb-2">Pesanan Selesai!</h2>
             <p class="text-on-surface-variant mb-8">Kerja bagus! Sampah warga berhasil diangkut. Lanjut ke tugas berikutnya.</p>
             
-            <a href="{{ route('petugas.komplek.warga', 1) }}" class="w-full bg-primary text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98]">
+            <a href="{{ route('petugas.komplek.warga', ['id' => $pesanan->komplek_id]) }}" class="w-full bg-primary text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98]">
                 Kembali ke Daftar Warga
             </a>
         </div>
@@ -134,7 +147,33 @@
             <h2 class="text-2xl font-black text-on-surface mb-2">Tugas Dibatalkan</h2>
             <p class="text-on-surface-variant mb-8">Laporan kendalamu telah dikirimkan ke Admin. Lanjut ke tugas berikutnya.</p>
             
-            <a href="{{ route('petugas.komplek.warga', 1) }}" class="w-full bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 font-bold py-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
+            <a href="{{ route('petugas.komplek.warga', ['id' => $pesanan->komplek_id]) }}" class="w-full bg-red-50 border border-red-200 hover:bg-red-100 text-red-600 font-bold py-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
+                Kembali ke Daftar Warga
+            </a>
+        </div>
+
+        <!-- RESCHEDULE STATE UI (Tampil jika pagar terkunci) -->
+        <div x-show="status === 'dijadwalkan_ulang'" x-transition.opacity.duration.300ms class="min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center" style="display: none;">
+            <div class="w-24 h-24 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-[48px]">event_repeat</span>
+            </div>
+            <h2 class="text-2xl font-black text-on-surface mb-2">Penjadwalan Ulang Berhasil</h2>
+            <p class="text-on-surface-variant mb-8">Pesanan ini telah dijadwalkan ulang ke tanggal <span class="font-bold text-on-surface" x-text="newScheduleDate"></span>. Lanjut ke tugas berikutnya.</p>
+            
+            <a href="{{ route('petugas.komplek.warga', ['id' => $pesanan->komplek_id]) }}" class="w-full bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-600 font-bold py-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
+                Kembali ke Daftar Warga
+            </a>
+        </div>
+
+        <!-- HOLD KAPASITAS STATE UI (Tampil jika beda ukuran) -->
+        <div x-show="status === 'hold_kapasitas'" x-transition.opacity.duration.300ms class="min-h-screen flex flex-col items-center justify-center px-6 py-12 text-center" style="display: none;">
+            <div class="w-24 h-24 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-[48px]">warning</span>
+            </div>
+            <h2 class="text-2xl font-black text-on-surface mb-2">Laporan Beda Ukuran Dikirim</h2>
+            <p class="text-on-surface-variant mb-8">Menunggu persetujuan dan pembayaran tambahan dari warga terkait. Lanjut ke tugas berikutnya.</p>
+            
+            <a href="{{ route('petugas.komplek.warga', ['id' => $pesanan->komplek_id]) }}" class="w-full bg-orange-50 border border-orange-200 hover:bg-orange-100 text-orange-600 font-bold py-4 rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
                 Kembali ke Daftar Warga
             </a>
         </div>
@@ -152,7 +191,20 @@
                         <p class="text-sm text-on-surface-variant mb-6">Pastikan kamu sudah mengangkut semua sampah milik warga ini dan mengambil foto bukti.</p>
                         <div class="flex gap-3">
                             <button @click="showConfirmSelesai = false" class="flex-1 py-3 rounded-xl font-bold text-on-surface bg-surface-variant transition-colors">Batal</button>
-                            <button @click="showConfirmSelesai = false; status = 'selesai'" class="flex-1 py-3 rounded-xl font-bold text-white bg-primary shadow-lg shadow-primary/30 transition-colors">Ya, Selesai</button>
+                            <button 
+                                @click="
+                                    isLoading = true;
+                                    let fd = new FormData();
+                                    fd.append('status', 'selesai');
+                                    if ($refs.fotoBukti && $refs.fotoBukti.files[0]) fd.append('foto_bukti', $refs.fotoBukti.files[0]);
+                                    axios.post('/petugas/tugas/' + pesananId + '/status', fd, {
+                                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, 'Content-Type': 'multipart/form-data' }
+                                    }).then(r => { showConfirmSelesai = false; status = 'selesai'; isLoading = false; })
+                                    .catch(e => { showConfirmSelesai = false; alert(e.response?.data?.message || 'Gagal menyelesaikan'); isLoading = false; })
+                                " 
+                                :disabled="isLoading"
+                                class="flex-1 py-3 rounded-xl font-bold text-white bg-primary shadow-lg shadow-primary/30 transition-colors disabled:opacity-50"
+                                x-text="isLoading ? 'Memproses...' : 'Ya, Selesai'">Ya, Selesai</button>
                         </div>
                     </div>
                 </div>

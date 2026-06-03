@@ -42,11 +42,11 @@
 @section('header')
     <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm">
-            B
+            {{ substr($namaUser, 0, 1) }}
         </div>
         <div class="flex flex-col">
             <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">Selamat datang,</span>
-            <span class="text-sm font-bold text-on-surface truncate max-w-[150px] flex items-center gap-1">Budi Santoso
+            <span class="text-sm font-bold text-on-surface truncate max-w-[150px] flex items-center gap-1">{{ $namaUser }}
                 <span class="animate-wave text-lg origin-bottom-right inline-block">👋</span></span>
         </div>
     </div>
@@ -54,7 +54,9 @@
         <button @click="showNotif = !showNotif"
             class="relative p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">
             <span class="material-symbols-outlined">notifications</span>
+            @if($unreadCount > 0)
             <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+            @endif
         </button>
 
         <!-- Notification Dropdown -->
@@ -63,30 +65,26 @@
             style="display:none;">
             <div class="p-4 border-b border-outline flex justify-between items-center bg-surface">
                 <h3 class="font-bold text-on-surface">Notifikasi</h3>
-                <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">2 Baru</span>
+                <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">{{ $unreadCount }} Baru</span>
             </div>
             <div class="max-h-80 overflow-y-auto">
-                <div class="p-4 border-b border-outline hover:bg-surface transition-colors cursor-pointer opacity-100">
-                    <p class="font-bold text-sm text-on-surface">Pesanan Selesai!</p>
-                    <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Pesanan #ORD-001 telah selesai. Koin
-                        sebesar 150 telah ditambahkan ke saldo Anda.</p>
-                    <p class="text-[10px] text-on-surface-variant mt-2 font-medium">Baru saja</p>
-                </div>
-                <div class="p-4 border-b border-outline hover:bg-surface transition-colors cursor-pointer opacity-100">
-                    <p class="font-bold text-sm text-on-surface">Laporan Diterima</p>
-                    <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Laporan sampah liar di Lahan Kosong Blok C
-                        sedang diproses oleh admin.</p>
-                    <p class="text-[10px] text-on-surface-variant mt-2 font-medium">2 jam yang lalu</p>
-                </div>
-                <div class="p-4 hover:bg-surface transition-colors cursor-pointer opacity-60">
-                    <p class="font-bold text-sm text-on-surface">Selamat Datang di EcoTrash</p>
-                    <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Lengkapi profil Anda dan mulai bantu
-                        ciptakan lingkungan yang lebih bersih.</p>
-                    <p class="text-[10px] text-on-surface-variant mt-2 font-medium">1 hari yang lalu</p>
-                </div>
+                @forelse($unreadNotifications as $notif)
+                    <div class="p-4 border-b border-outline hover:bg-surface transition-colors cursor-pointer {{ $notif->is_read ? 'opacity-60' : 'opacity-100' }}">
+                        <p class="font-bold text-sm text-on-surface">{{ $notif->judul }}</p>
+                        <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">{{ $notif->pesan }}</p>
+                        <p class="text-[10px] text-on-surface-variant mt-2 font-medium">{{ $notif->created_at->diffForHumans() }}</p>
+                    </div>
+                @empty
+                    <div class="p-6 text-center">
+                        <p class="text-sm text-on-surface-variant">Belum ada notifikasi.</p>
+                    </div>
+                @endforelse
             </div>
             <div class="p-3 border-t border-outline text-center bg-surface">
-                <a href="#" class="text-sm font-bold text-primary hover:underline">Tandai semua dibaca</a>
+                <form method="POST" action="{{ route('notifikasi.markAllRead') }}">
+                    @csrf
+                    <button type="submit" class="text-sm font-bold text-primary hover:underline">Tandai semua dibaca</button>
+                </form>
             </div>
         </div>
     </div>
@@ -94,47 +92,82 @@
 
 @section('content')
     <div class="p-4 md:p-0 space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-8"
-        x-data="{ hasActiveOrder: true, hasSelisihOrder: true, hasGagalPickupOrder: true, showHistory: false, showTrackingModal: false, showSelisihModal: false, isPayingSelisih: false, paySelisih() { this.isPayingSelisih = true; setTimeout(() => { this.isPayingSelisih = false; this.showSelisihModal = false; this.hasSelisihOrder = false; showToast('Pembayaran berhasil. Jadwal diundur ke hari kerja berikutnya.', 'success'); }, 2000); } }">
+        x-data="{
+            hasActiveOrder: {{ $pesananAktif ? 'true' : 'false' }},
+            pesananAktifData: @js($pesananAktif ? [
+                'id' => $pesananAktif->id,
+                'status' => $pesananAktif->status,
+                'kategori_sampah' => $pesananAktif->kategori_sampah,
+                'tanggal' => $pesananAktif->tanggal_penjemputan ? $pesananAktif->tanggal_penjemputan->translatedFormat('l, d M Y') : '-',
+                'total_harga' => $pesananAktif->total_harga_akhir,
+                'riwayat' => $pesananAktif->riwayatStatus->map(fn($r) => [
+                    'status' => $r->status,
+                    'keterangan' => $r->keterangan,
+                    'waktu' => $r->created_at ? $r->created_at->translatedFormat('d M Y, H:i') : '-',
+                ]),
+            ] : null),
+            showHistory: false,
+            showTrackingModal: false,
+            showSelisihModal: false,
+            isPayingSelisih: false,
+            statusLabel(status) {
+                return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            },
+            paySelisih() {
+                this.isPayingSelisih = true;
+                setTimeout(() => {
+                    document.getElementById('form-bayar-selisih').submit();
+                }, 1500);
+            }
+        }">
 
         <!-- Left Column (Desktop) -->
         <div class="md:col-span-8 space-y-6 md:space-y-8">
 
-            <!-- Banner Notifikasi: Gagal Pickup (Pagar Tertutup) -->
-            <template x-if="hasGagalPickupOrder">
+            {{-- Banner Kondisional: Gagal Pickup --}}
+            @if($pesananGagalPickup)
                 <div class="bg-red-50 border border-red-200 rounded-3xl p-5 flex items-start gap-4">
                     <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
                         <span class="material-symbols-outlined">door_front</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-red-800 text-sm md:text-base">Gagal Pickup: Pagar Tertutup</h3>
-                        <p class="text-xs md:text-sm text-red-700 mt-1">Petugas tidak dapat mengambil sampah Anda karena
-                            pagar tertutup. Jadwal pengangkutan Anda dialihkan ke hari kerja berikutnya.</p>
-                        <button @click="hasGagalPickupOrder = false"
-                            class="mt-3 text-xs font-bold text-red-600 bg-red-100 hover:bg-red-200 px-3 py-1.5 rounded-lg transition-colors">Tutup
-                            Notifikasi</button>
+                        <h3 class="font-bold text-red-800 text-sm md:text-base">Gagal Pickup: {{ $pesananGagalPickup->alasan_kendala ?? 'Pagar Tertutup' }}</h3>
+                        <p class="text-xs md:text-sm text-red-700 mt-1">Petugas tidak dapat mengambil sampah Anda. Jadwal pengangkutan Anda dialihkan ke hari kerja berikutnya.</p>
                     </div>
                 </div>
-            </template>
+            @endif
 
-            <!-- Banner Notifikasi: Selisih Pembayaran -->
-            <template x-if="hasSelisihOrder">
+            {{-- Banner Kondisional: Pembayaran Tambahan (hold_kapasitas) --}}
+            @if($pesananHoldKapasitas)
+                @php
+                    $ukuranAktual = strtolower($pesananHoldKapasitas->ukuran_aktual_laporan_petugas ?? 'sedang');
+                    $hargaAktual = $pengaturan->{'harga_kategori_' . $ukuranAktual} ?? 0;
+                    
+                    $ukuranAwal = strtolower($pesananHoldKapasitas->kategori_sampah ?? 'kecil');
+                    $hargaAwal = $pengaturan->{'harga_kategori_' . $ukuranAwal} ?? 0;
+                    
+                    $selisihHitung = max(0, $hargaAktual - $hargaAwal);
+                @endphp
                 <div class="bg-amber-50 border border-amber-200 rounded-3xl p-5 flex items-start gap-4">
-                    <div
-                        class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
                         <span class="material-symbols-outlined">receipt_long</span>
                     </div>
                     <div class="flex-1">
-                        <h3 class="font-bold text-amber-900 text-sm md:text-base">Pembayaran Tambahan Diperlukan</h3>
-                        <p class="text-xs md:text-sm text-amber-800 mt-1">Petugas melaporkan ukuran sampah aktual lebih
-                            besar dari pesanan. Mohon lakukan pembayaran selisih harga sebesar <b>Rp10.000</b>.</p>
-                        <p class="text-[10px] text-amber-700 mt-1 font-medium">*Setelah pembayaran, jadwal akan diatur ulang
-                            ke hari kerja berikutnya.</p>
+                        <h3 class="font-bold text-amber-900 text-sm md:text-base">Perhatian! Pembayaran Tambahan Diperlukan</h3>
+                        <p class="text-xs md:text-sm text-amber-800 mt-1">
+                            Kapasitas aktual yang dilaporkan petugas adalah <b>{{ ucfirst($ukuranAktual) }}</b> (Rp{{ number_format($hargaAktual, 0, ',', '.') }}). 
+                            Harga pesanan awal Anda: Rp{{ number_format($hargaAwal, 0, ',', '.') }}. 
+                            Total selisih yang harus dibayar: <b>Rp{{ number_format($selisihHitung, 0, ',', '.') }}</b>.
+                        </p>
                         <button @click="showSelisihModal = true"
-                            class="mt-3 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 px-4 py-2 rounded-xl transition-colors shadow-sm">Bayar
-                            Sekarang</button>
+                            class="mt-3 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 px-4 py-2 rounded-xl transition-colors shadow-sm">Bayar Sekarang</button>
                     </div>
                 </div>
-            </template>
+                
+                <form id="form-bayar-selisih" action="{{ route('warga.pesanan.bayar_selisih', $pesananHoldKapasitas->id) }}" method="POST" class="hidden">
+                    @csrf
+                </form>
+            @endif
 
             <!-- Coin Balance Card -->
             <div
@@ -145,7 +178,7 @@
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-[36px] md:text-[48px] text-amber-100 animate-pulse"
                                 style="font-variation-settings: 'FILL' 1;">generating_tokens</span>
-                            <span class="text-4xl md:text-5xl font-black tracking-tight drop-shadow-md">450</span>
+                            <span class="text-4xl md:text-5xl font-black tracking-tight drop-shadow-md">{{ number_format($saldoKoin) }}</span>
                         </div>
                     </div>
                     <button @click="showHistory = true"
@@ -170,8 +203,9 @@
                         </div>
                         <div>
                             <p class="text-base font-bold text-primary">Pesanan Sedang Diproses</p>
-                            <p class="text-sm text-primary/80 mt-0.5 font-medium">Petugas sedang menuju lokasi Anda (12 Mei
-                                2026)</p>
+                            @if($pesananAktif)
+                            <p class="text-sm text-primary/80 mt-0.5 font-medium">Petugas sedang menuju lokasi Anda ({{ $pesananAktif->tanggal_penjemputan ? $pesananAktif->tanggal_penjemputan->translatedFormat('d F Y') : '-' }})</p>
+                            @endif
                         </div>
                     </div>
                     <span
@@ -271,122 +305,42 @@
                 </div>
 
                 <div class="max-h-[60vh] overflow-y-auto">
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">add</span>
+                    @forelse($riwayatKoin as $koin)
+                        <div class="p-4 {{ !$loop->last ? 'border-b border-outline' : '' }} flex items-center gap-4 hover:bg-surface-variant transition-colors">
+                            <div class="w-10 h-10 rounded-full {{ $koin->tipe_transaksi === 'masuk' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }} flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined">{{ $koin->tipe_transaksi === 'masuk' ? 'add' : 'remove' }}</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-sm text-on-surface">
+                                    @if($koin->sumber === 'pesanan') Pesanan {{ $koin->tipe_transaksi === 'masuk' ? 'Selesai' : 'Potongan' }} #{{ $koin->referensi_id }}
+                                    @elseif($koin->sumber === 'laporan_liar') Laporan Disetujui
+                                    @elseif($koin->sumber === 'sistem') Bonus Sistem
+                                    @else Transaksi Koin
+                                    @endif
+                                </p>
+                                <p class="text-xs text-on-surface-variant">{{ $koin->created_at->translatedFormat('d F Y') }}</p>
+                            </div>
+                            <span class="font-black {{ $koin->tipe_transaksi === 'masuk' ? 'text-green-600' : 'text-red-600' }}">{{ $koin->tipe_transaksi === 'masuk' ? '+' : '-' }}{{ $koin->jumlah }}</span>
                         </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Pesanan Selesai #ORD-001</p>
-                            <p class="text-xs text-on-surface-variant">10 Mei 2026</p>
+                    @empty
+                        <div class="p-6 text-center">
+                            <p class="text-sm text-on-surface-variant">Belum ada riwayat koin.</p>
                         </div>
-                        <span class="font-black text-green-600">+150</span>
-                    </div>
-
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">remove</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Potongan Pesanan #ORD-002</p>
-                            <p class="text-xs text-on-surface-variant">08 Mei 2026</p>
-                        </div>
-                        <span class="font-black text-red-600">-50</span>
-                    </div>
-
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">add</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Bonus Pendaftaran</p>
-                            <p class="text-xs text-on-surface-variant">01 Mei 2026</p>
-                        </div>
-                        <span class="font-black text-green-600">+350</span>
-                    </div>
-
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">add</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Laporan Disetujui</p>
-                            <p class="text-xs text-on-surface-variant">28 April 2026</p>
-                        </div>
-                        <span class="font-black text-green-600">+50</span>
-                    </div>
-
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">remove</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Potongan Pesanan #ORD-003</p>
-                            <p class="text-xs text-on-surface-variant">25 April 2026</p>
-                        </div>
-                        <span class="font-black text-red-600">-100</span>
-                    </div>
-
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">add</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Pesanan Selesai #ORD-003</p>
-                            <p class="text-xs text-on-surface-variant">26 April 2026</p>
-                        </div>
-                        <span class="font-black text-green-600">+100</span>
-                    </div>
-
-                    <div
-                        class="p-4 border-b border-outline flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">add</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Bonus Membaca Edukasi</p>
-                            <p class="text-xs text-on-surface-variant">20 April 2026</p>
-                        </div>
-                        <span class="font-black text-green-600">+10</span>
-                    </div>
-
-                    <div class="p-4 flex items-center gap-4 hover:bg-surface-variant transition-colors">
-                        <div
-                            class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">add</span>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-sm text-on-surface">Bonus Pendaftaran Awal</p>
-                            <p class="text-xs text-on-surface-variant">15 April 2026</p>
-                        </div>
-                        <span class="font-black text-green-600">+50</span>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- Tracking Modal -->
+        <!-- Tracking Modal (Dynamic Timeline) -->
         <div x-show="showTrackingModal" x-transition.opacity
             class="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-center justify-center p-4"
             style="display:none;" @click.self="showTrackingModal = false">
             <div x-show="showTrackingModal" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden relative">
+                class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
 
-                <div class="p-5 border-b border-outline flex justify-between items-center bg-surface">
+                <div class="p-5 border-b border-outline flex justify-between items-center bg-surface shrink-0">
                     <h3 class="font-black text-lg text-on-surface">Detail Lacak Pesanan</h3>
                     <button @click="showTrackingModal = false"
                         class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface hover:bg-red-100 hover:text-red-600 transition-colors">
@@ -394,46 +348,51 @@
                     </button>
                 </div>
 
-                <div class="p-6">
-                    <div class="flex items-center gap-4 mb-6 p-4 bg-primary/5 border border-primary/20 rounded-2xl">
-                        <div
-                            class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                            <span class="material-symbols-outlined">local_shipping</span>
-                        </div>
+                <div class="p-6 overflow-y-auto">
+                    <template x-if="pesananAktifData">
                         <div>
-                            <p class="font-bold text-on-surface">Menuju Lokasi Anda</p>
-                            <p class="text-xs text-on-surface-variant">Estimasi tiba: 10-15 menit</p>
-                        </div>
-                    </div>
+                            <!-- Pesanan Info Card -->
+                            <div class="flex items-center gap-4 mb-6 p-4 bg-primary/5 border border-primary/20 rounded-2xl">
+                                <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                                    <span class="material-symbols-outlined">local_shipping</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-on-surface text-sm truncate" x-text="'Pesanan #' + pesananAktifData.id"></p>
+                                    <p class="text-xs text-on-surface-variant" x-text="pesananAktifData.tanggal"></p>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <p class="text-xs text-on-surface-variant">Total</p>
+                                    <p class="font-black text-primary" x-text="'Rp' + Number(pesananAktifData.total_harga).toLocaleString('id-ID')"></p>
+                                </div>
+                            </div>
 
-                    <div
-                        class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-outline before:to-transparent">
-                        <div class="relative flex items-center justify-between md:justify-normal group is-active">
-                            <div
-                                class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-primary text-white shrink-0 shadow-sm z-10">
-                                <span class="material-symbols-outlined text-[16px]">check</span>
-                            </div>
-                            <div class="w-[calc(100%-3rem)] p-4 rounded-xl border border-primary bg-primary/5 shadow-sm">
-                                <h3 class="font-bold text-primary text-sm">Menuju Lokasi</h3>
-                                <p class="text-xs text-on-surface-variant mt-1">Petugas (Ahmad) sedang dalam perjalanan.</p>
-                            </div>
-                        </div>
-                        <div class="relative flex items-center justify-between md:justify-normal group">
-                            <div
-                                class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-surface-variant text-on-surface-variant shrink-0 z-10">
-                                <span class="material-symbols-outlined text-[16px]">inventory_2</span>
-                            </div>
-                            <div class="w-[calc(100%-3rem)] p-4 rounded-xl border border-outline bg-surface">
-                                <h3 class="font-bold text-on-surface text-sm">Pesanan Diterima</h3>
-                                <p class="text-xs text-on-surface-variant mt-1">Menunggu petugas mengambil pesanan.</p>
+                            <!-- Dynamic Timeline from riwayatStatus -->
+                            <div class="space-y-0 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-outline before:to-transparent">
+                                <template x-for="(step, index) in pesananAktifData.riwayat" :key="index">
+                                    <div class="relative flex items-start gap-4 pb-6">
+                                        <!-- Timeline dot -->
+                                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shrink-0 shadow-sm z-10"
+                                             :class="index === pesananAktifData.riwayat.length - 1 ? 'bg-primary text-white' : 'bg-green-500 text-white'">
+                                            <span class="material-symbols-outlined text-[16px]" x-text="index === pesananAktifData.riwayat.length - 1 ? (step.status === 'selesai' ? 'check_circle' : 'radio_button_checked') : 'check'"></span>
+                                        </div>
+                                        <!-- Timeline content -->
+                                        <div class="flex-1 p-4 rounded-xl border shadow-sm"
+                                             :class="index === pesananAktifData.riwayat.length - 1 ? 'border-primary bg-primary/5' : 'border-outline bg-surface'">
+                                            <h4 class="font-bold text-sm" :class="index === pesananAktifData.riwayat.length - 1 ? 'text-primary' : 'text-on-surface'" x-text="statusLabel(step.status)"></h4>
+                                            <p class="text-xs text-on-surface-variant mt-1" x-text="step.keterangan"></p>
+                                            <p class="text-[10px] text-on-surface-variant mt-2 font-medium" x-text="step.waktu"></p>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
         </div>
 
-        <!-- Selisih Payment Modal -->
+        {{-- Selisih Payment Modal (hanya render jika ada pesanan hold_kapasitas) --}}
+        @if($pesananHoldKapasitas)
         <div x-show="showSelisihModal" x-transition.opacity
             class="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-center justify-center p-4"
             style="display:none;" @click.self="showSelisihModal = false">
@@ -464,7 +423,7 @@
                 <div class="bg-surface-variant p-4 rounded-2xl flex justify-between items-center text-left">
                     <div>
                         <p class="text-xs font-bold text-on-surface-variant mb-1">Total Bayar</p>
-                        <p class="text-lg font-black text-primary">Rp10.000</p>
+                        <p class="text-lg font-black text-primary">Rp{{ number_format($selisihHitung, 0, ',', '.') }}</p>
                     </div>
                     <span class="text-xs font-bold bg-white px-2 py-1 rounded shadow-sm">EcoTrash Pay</span>
                 </div>
@@ -479,6 +438,7 @@
                     Saja</button>
             </div>
         </div>
+        @endif
 
     </div>
 @endsection

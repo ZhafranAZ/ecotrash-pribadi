@@ -9,6 +9,33 @@
 @endsection
 
 @section('content')
+{{-- Flash Messages --}}
+@if(session('success'))
+<div class="mx-4 md:mx-0 mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium flex items-center gap-2">
+    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+    {{ session('success') }}
+</div>
+@endif
+@if(session('error'))
+<div class="mx-4 md:mx-0 mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium flex items-center gap-2">
+    <span class="material-symbols-outlined text-[20px]">error</span>
+    {{ session('error') }}
+</div>
+@endif
+@if($errors->any())
+<div class="mx-4 md:mx-0 mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-medium">
+    <div class="flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-[20px]">error</span>
+        <span class="font-bold">Terdapat kesalahan:</span>
+    </div>
+    <ul class="list-disc list-inside space-y-1">
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
 <div class="p-4 md:p-0 md:grid md:grid-cols-12 md:gap-8 md:items-start" x-data="{ 
     showAddressModal: false, 
     showEditProfileModal: false, 
@@ -16,8 +43,9 @@
     showAddAddressForm: false, 
     showDeleteAddressConfirm: false,
     showEditAddressForm: false,
-    primaryId: 1,
-    editingAddress: { id: null, title: '', komplek: '', detail: '' },
+    deleteAddressId: null,
+    primaryId: {{ $primaryAddressId ?? 'null' }},
+    editingAddress: { id: null, title: '', komplek_id: '', blok_nomor_rumah: '', detail_patokan: '' },
     profileImage: null,
     handleImageUpload(e) {
         const file = e.target.files[0];
@@ -25,21 +53,16 @@
             this.profileImage = URL.createObjectURL(file);
         }
     },
-    addresses: [
-        { id: 1, title: 'Rumah', komplek: 'Bunga Asri', detail: 'Blok C2 No. 15, RT 04 RW 02, Kec. Sukajadi' },
-        { id: 2, title: 'Kantor', komplek: 'Griya Indah', detail: 'Gedung X Lt. 4, Sudirman, Jakarta' }
-    ],
+    addresses: {{ json_encode($addressesJson) }},
     startEdit(addr) {
-        this.editingAddress = { ...addr };
+        this.editingAddress = {
+            id: addr.id,
+            title: addr.title,
+            komplek_id: addr.komplek_id,
+            blok_nomor_rumah: addr.blok_nomor_rumah,
+            detail_patokan: addr.detail_patokan
+        };
         this.showEditAddressForm = true;
-    },
-    saveEdit() {
-        let index = this.addresses.findIndex(a => a.id === this.editingAddress.id);
-        if (index !== -1) {
-            this.addresses[index] = { ...this.editingAddress };
-        }
-        this.showEditAddressForm = false;
-        showToast('Alamat berhasil diperbarui', 'success');
     }
 }">
     
@@ -50,7 +73,7 @@
             
             <div class="w-28 h-28 md:w-36 md:h-36 rounded-full bg-surface flex items-center justify-center text-primary text-5xl md:text-6xl font-black mb-4 border-4 border-white shadow-lg relative z-10 overflow-hidden group">
                 <template x-if="!profileImage">
-                    <span>B</span>
+                    <span>{{ strtoupper(substr($user->nama, 0, 1)) }}</span>
                 </template>
                 <template x-if="profileImage">
                     <img :src="profileImage" alt="Profile" class="w-full h-full object-cover">
@@ -62,11 +85,11 @@
                 <input type="file" id="profile_upload" accept="image/*" class="hidden" @change="handleImageUpload">
             </div>
 
-            <h2 class="font-black text-2xl md:text-3xl text-on-surface z-10">Budi Santoso</h2>
-            <p class="text-sm md:text-base font-medium text-on-surface-variant z-10">budi.s@example.com</p>
+            <h2 class="font-black text-2xl md:text-3xl text-on-surface z-10">{{ $user->nama }}</h2>
+            <p class="text-sm md:text-base font-medium text-on-surface-variant z-10">{{ $user->email }}</p>
             <div class="mt-4 flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full text-amber-600 font-bold shadow-sm z-10">
                 <span class="material-symbols-outlined">generating_tokens</span>
-                450 Koin Eco
+                {{ $user->saldo_koin }} Koin Eco
             </div>
         </div>
     </div>
@@ -97,7 +120,7 @@
                 </div>
                 <div class="flex-1">
                     <p class="font-bold text-base md:text-lg text-on-surface">Kelola Alamat</p>
-                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">Rumah Utama, Kantor (1 Tersimpan)</p>
+                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">{{ $alamatList->count() }} Alamat Tersimpan</p>
                 </div>
                 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
             </button>
@@ -108,7 +131,7 @@
                 </div>
                 <div class="flex-1">
                     <p class="font-bold text-base md:text-lg text-on-surface">Artikel Edukasi Tersimpan</p>
-                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">Anda menyimpan 2 panduan.</p>
+                    <p class="text-xs md:text-sm text-on-surface-variant mt-0.5">Anda menyimpan {{ auth()->user()->bookmarkArtikel()->count() }} artikel.</p>
                 </div>
                 <span class="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
             </a>
@@ -176,9 +199,15 @@
                                 <div class="flex gap-2">
                                     <button @click.stop="startEdit(addr)" class="text-xs font-bold text-primary hover:underline">Edit</button>
                                     <span class="text-outline">|</span>
-                                    <button @click="showDeleteAddressConfirm = true" class="text-xs font-bold text-red-500 hover:underline">Hapus</button>
+                                    <button @click="deleteAddressId = addr.id; showDeleteAddressConfirm = true" class="text-xs font-bold text-red-500 hover:underline">Hapus</button>
                                 </div>
-                                <button x-show="primaryId !== addr.id" @click="primaryId = addr.id" class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20 hover:bg-primary/20 transition-colors">Jadikan Utama</button>
+                                <template x-if="primaryId !== addr.id">
+                                    <form :action="'{{ url('warga/profil/alamat') }}/' + addr.id + '/utama'" method="POST" class="inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20 hover:bg-primary/20 transition-colors">Jadikan Utama</button>
+                                    </form>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -201,23 +230,30 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-            <h3 class="font-bold text-lg text-on-surface mb-2">Edit Profil</h3>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Lengkap</label>
-                <input type="text" value="Budi Santoso" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Email</label>
-                <input type="email" value="budi.s@example.com" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Nomor HP</label>
-                <input type="text" value="08123456789" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-            </div>
-            <div class="flex gap-3 mt-6">
-                <button @click="showEditProfileModal = false" class="flex-1 py-3 text-sm font-bold text-on-surface-variant bg-surface-variant rounded-xl">Batal</button>
-                <button @click="showEditProfileModal = false" class="flex-1 py-3 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl shadow-md">Simpan</button>
-            </div>
+            <form action="{{ route('warga.profil.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <h3 class="font-bold text-lg text-on-surface mb-2">Edit Profil</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Lengkap</label>
+                        <input type="text" name="nama" value="{{ old('nama', $user->nama) }}" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Email</label>
+                        <input type="email" value="{{ $user->email }}" disabled class="w-full border border-outline rounded-xl p-3 text-sm bg-surface-dim text-on-surface-variant cursor-not-allowed outline-none">
+                        <p class="text-[10px] text-on-surface-variant mt-1">Email tidak dapat diubah.</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Nomor HP</label>
+                        <input type="text" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" @click="showEditProfileModal = false" class="flex-1 py-3 text-sm font-bold text-on-surface-variant bg-surface-variant rounded-xl">Batal</button>
+                    <button type="submit" class="flex-1 py-3 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl shadow-md">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -255,35 +291,40 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-            <h3 class="font-bold text-lg text-on-surface mb-2">Tambah Alamat Baru</h3>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Alamat (Misal: Rumah, Kantor)</label>
-                <input type="text" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white">
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Pilih Perumahan/Komplek</label>
-                <div class="relative">
-                    <select class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white appearance-none cursor-pointer">
-                        <option value="" disabled selected>Pilih salah satu...</option>
-                        <option value="Bunga Asri">Komplek Bunga Asri</option>
-                        <option value="Griya Indah">Perumahan Griya Indah</option>
-                        <option value="Pesona Alam">Pesona Alam Residence</option>
-                    </select>
-                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+            <form action="{{ route('warga.profil.alamat.store') }}" method="POST">
+                @csrf
+                <h3 class="font-bold text-lg text-on-surface mb-2">Tambah Alamat Baru</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Alamat (Misal: Rumah, Kantor)</label>
+                        <input type="text" name="nama_alamat" value="{{ old('nama_alamat') }}" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Pilih Perumahan/Komplek</label>
+                        <div class="relative">
+                            <select name="komplek_id" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white appearance-none cursor-pointer">
+                                <option value="" disabled selected>Pilih salah satu...</option>
+                                @foreach($kompleks as $k)
+                                    <option value="{{ $k->id }}" {{ old('komplek_id') == $k->id ? 'selected' : '' }}>{{ $k->nama_komplek }}</option>
+                                @endforeach
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Alamat Lengkap (Blok/Nomor Rumah)</label>
+                        <textarea rows="3" name="blok_nomor_rumah" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Nama Jalan, RT/RW, Kelurahan">{{ old('blok_nomor_rumah') }}</textarea>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Patokan/Detail (Opsional)</label>
+                        <input type="text" name="detail_patokan" value="{{ old('detail_patokan') }}" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Cth: Pagar Hitam, Depan Warung">
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Alamat Lengkap (Blok/Nomor Rumah)</label>
-                <textarea rows="3" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Nama Jalan, RT/RW, Kelurahan"></textarea>
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Patokan/Detail (Opsional)</label>
-                <input type="text" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Cth: Pagar Hitam, Depan Warung">
-            </div>
-            <div class="flex gap-3 mt-6">
-                <button @click="showAddAddressForm = false" class="flex-1 py-3 text-sm font-bold text-on-surface-variant bg-surface-variant rounded-xl">Batal</button>
-                <button @click="showAddAddressForm = false; showAddressModal = false;" class="flex-1 py-3 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl shadow-md">Simpan</button>
-            </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" @click="showAddAddressForm = false" class="flex-1 py-3 text-sm font-bold text-on-surface-variant bg-surface-variant rounded-xl">Batal</button>
+                    <button type="submit" class="flex-1 py-3 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl shadow-md">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -294,30 +335,40 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95 translate-y-4"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-            <h3 class="font-bold text-lg text-on-surface mb-2">Ubah Alamat</h3>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Alamat (Misal: Rumah, Kantor)</label>
-                <input type="text" x-model="editingAddress.title" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white">
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Pilih Perumahan/Komplek</label>
-                <div class="relative">
-                    <select x-model="editingAddress.komplek" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white appearance-none cursor-pointer">
-                        <option value="Bunga Asri">Komplek Bunga Asri</option>
-                        <option value="Griya Indah">Perumahan Griya Indah</option>
-                        <option value="Pesona Alam">Pesona Alam Residence</option>
-                    </select>
-                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+            <form :action="'{{ url('warga/profil/alamat') }}/' + editingAddress.id" method="POST">
+                @csrf
+                @method('PUT')
+                <h3 class="font-bold text-lg text-on-surface mb-2">Ubah Alamat</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Nama Alamat (Misal: Rumah, Kantor)</label>
+                        <input type="text" name="nama_alamat" x-model="editingAddress.title" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Pilih Perumahan/Komplek</label>
+                        <div class="relative">
+                            <select name="komplek_id" x-model="editingAddress.komplek_id" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-white appearance-none cursor-pointer">
+                                @foreach($kompleks as $k)
+                                    <option value="{{ $k->id }}">{{ $k->nama_komplek }}</option>
+                                @endforeach
+                            </select>
+                            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Alamat Lengkap (Blok/Nomor Rumah)</label>
+                        <textarea rows="3" name="blok_nomor_rumah" x-model="editingAddress.blok_nomor_rumah" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Nama Jalan, RT/RW, Kelurahan"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant block mb-1">Patokan/Detail (Opsional)</label>
+                        <input type="text" name="detail_patokan" x-model="editingAddress.detail_patokan" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Cth: Pagar Hitam, Depan Warung">
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="text-xs font-bold text-on-surface-variant block mb-1">Detail Alamat</label>
-                <textarea rows="3" x-model="editingAddress.detail" class="w-full border border-outline rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Nama Jalan, RT/RW, Kelurahan"></textarea>
-            </div>
-            <div class="flex gap-3 mt-6">
-                <button @click="showEditAddressForm = false" class="flex-1 py-3 text-sm font-bold text-on-surface-variant bg-surface-variant rounded-xl">Batal</button>
-                <button @click="saveEdit()" class="flex-1 py-3 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl shadow-md">Simpan Perubahan</button>
-            </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" @click="showEditAddressForm = false" class="flex-1 py-3 text-sm font-bold text-on-surface-variant bg-surface-variant rounded-xl">Batal</button>
+                    <button type="submit" class="flex-1 py-3 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl shadow-md">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
     </div>
     <!-- Delete Address Confirmation Modal -->
@@ -331,12 +382,17 @@
                 <span class="material-symbols-outlined text-[40px]">delete_forever</span>
             </div>
             <h3 class="font-black text-xl text-on-surface mb-2">Hapus Alamat?</h3>
-            <p class="text-sm text-on-surface-variant mb-8">Alamat "Rumah Utama" akan dihapus secara permanen dari daftar alamat Anda.</p>
+            <p class="text-sm text-on-surface-variant mb-8">Alamat ini akan dihapus secara permanen dari daftar alamat Anda.</p>
             <div class="flex gap-3">
                 <button @click="showDeleteAddressConfirm = false" class="flex-1 font-bold text-on-surface-variant py-3 rounded-xl bg-surface border border-outline hover:bg-surface-variant transition-colors">Batal</button>
-                <button @click="showDeleteAddressConfirm = false" class="flex-1 font-bold text-white py-3 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 transition-colors flex items-center justify-center">Hapus</button>
+                <form :action="'{{ url('warga/profil/alamat') }}/' + deleteAddressId" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="w-full font-bold text-white py-3 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 transition-colors flex items-center justify-center">Hapus</button>
+                </form>
             </div>
         </div>
     </div>
+
 </div>
 @endsection

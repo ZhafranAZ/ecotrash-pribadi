@@ -25,10 +25,10 @@
             </div>
             <div class="text-left">
                 <p class="font-bold text-sm text-on-surface">No. Pesanan</p>
-                <p class="text-xs text-on-surface-variant font-mono">ORD-260512-001</p>
+                <p class="text-xs text-on-surface-variant font-mono">{{ $pesanan->id }}</p>
             </div>
         </div>
-        <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">Diproses</span>
+        <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md border border-primary/20">{{ ucfirst($pesanan->status) }}</span>
     </div>
 
     <!-- Coin Reward Element -->
@@ -39,11 +39,11 @@
                 <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">generating_tokens</span>
             </div>
             <div class="text-left">
-                <p class="font-bold text-amber-900">Selamat!</p>
-                <p class="text-xs text-amber-700 font-medium">Anda mendapatkan reward koin.</p>
+                <p class="font-bold text-amber-900">Bonus Koin Eco</p>
+                <p class="text-xs text-amber-700 font-medium">Anda akan mendapatkan reward koin setelah pesanan selesai.</p>
             </div>
         </div>
-        <span class="text-xl font-black text-amber-600 relative z-10">+20</span>
+        <span class="text-xl font-black text-amber-600 relative z-10">+{{ $pesanan->koin_didapat }}</span>
     </div>
 
     <div class="w-full max-w-sm space-y-3">

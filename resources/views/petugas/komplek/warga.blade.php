@@ -6,8 +6,8 @@
                 <span class="material-symbols-outlined">arrow_back</span>
             </a>
             <div>
-                <h1 class="text-xl font-black text-on-surface leading-tight">Perumahan Asri Indah</h1>
-                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Kec. Bojongsoang</p>
+                <h1 class="text-xl font-black text-on-surface leading-tight">{{ $komplek->nama_komplek }}</h1>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Tugas Hari Ini</p>
             </div>
         </div>
     </header>
@@ -16,39 +16,36 @@
         
         <!-- Action Button -->
         <div class="mb-2">
-            <a href="https://maps.google.com/?q=Perumahan+Asri+Indah" target="_blank" class="w-full bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold py-3.5 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 text-sm">
+            <a href="https://maps.google.com/?q={{ urlencode($komplek->nama_komplek) }}" target="_blank" class="w-full bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 font-bold py-3.5 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 text-sm">
                 <span class="material-symbols-outlined text-[20px]">map</span> Buka di Google Maps
             </a>
         </div>
 
         <div class="flex items-center justify-between mb-4 px-1">
             <h2 class="text-lg font-black text-on-surface">Daftar Titik Penjemputan</h2>
-            <span class="text-xs font-bold text-on-surface-variant">8 Titik tersisa</span>
+            <span class="text-xs font-bold text-on-surface-variant">{{ $pesanans->count() }} Titik tersisa</span>
         </div>
 
         <div class="space-y-4">
+            @forelse($pesanans as $pesanan)
             <x-petugas.task-card 
-                id="INV-1001" 
+                id="{{ $pesanan->id }}" 
                 type="angkut" 
-                time="08:00" 
-                address="Jl. Merdeka No. 45, Blok C"
-                note="Tolong panggil nomor rumah jika pagar dikunci."
+                time="{{ $pesanan->created_at->format('H:i') }}" 
+                address="{{ $pesanan->nama_alamat_snapshot }}, {{ $pesanan->blok_nomor_rumah }}"
+                :note="$pesanan->catatan_warga"
+                kategori="{{ $pesanan->kategori_sampah }}"
+                nama_warga="{{ $pesanan->warga->nama }}"
             />
-
-            <x-petugas.task-card 
-                id="INV-1002" 
-                type="angkut" 
-                time="08:15" 
-                address="Blok A No. 12"
-            />
-
-            <x-petugas.task-card 
-                id="INV-1003" 
-                type="angkut" 
-                time="08:30" 
-                address="Blok D No. 8"
-                note="Ada tambahan 2 kantong kresek di depan."
-            />
+            @empty
+            <div class="glass-card rounded-3xl p-8 text-center">
+                <div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center mx-auto mb-3">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">check_circle</span>
+                </div>
+                <p class="text-sm font-bold text-on-surface">Semua tugas sudah selesai!</p>
+                <p class="text-xs text-on-surface-variant mt-1">Tidak ada titik penjemputan yang tersisa.</p>
+            </div>
+            @endforelse
         </div>
         
     </div>

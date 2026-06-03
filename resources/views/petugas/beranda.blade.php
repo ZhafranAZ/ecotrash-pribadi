@@ -5,6 +5,7 @@
             <div>
                 <p class="text-sm font-bold text-on-surface-variant">Halo Petugas,</p>
                 <h1 class="text-2xl font-black text-on-surface">{{ $petugas->nama }}</h1>
+                <h1 class="text-2xl font-black text-on-surface">{{ $user->nama }}</h1>
             </div>
             <div class="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center border-2 border-white shadow-sm shrink-0">
                 <span class="material-symbols-outlined text-[24px]">account_circle</span>
@@ -62,6 +63,30 @@
                     <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">info</span>
                     <p class="text-sm font-bold text-on-surface">Tidak ada area tugas hari ini.</p>
                 </div>
+            <a href="{{ route('petugas.komplek.warga', ['id' => $komplek->id]) }}" class="block glass-card rounded-3xl p-5 hover:scale-[0.99] transition-transform">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl {{ $komplek->pesanan_count > 0 ? 'bg-primary/20 text-primary' : 'bg-surface-variant text-on-surface-variant' }} flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[28px]">{{ $loop->odd ? 'holiday_village' : 'domain' }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-base font-bold text-on-surface mb-0.5 truncate">{{ $komplek->nama_komplek }}</h3>
+                        <p class="text-xs font-medium text-on-surface-variant">Tugas hari ini</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $komplek->pesanan_count > 0 ? 'bg-primary text-white' : 'bg-surface text-on-surface border border-outline' }} text-xs font-black shadow-sm mb-1">
+                            {{ $komplek->pesanan_count }}
+                        </div>
+                        <p class="text-[10px] font-bold text-on-surface-variant">Titik</p>
+                    </div>
+                </div>
+            </a>
+            @empty
+            <div class="glass-card rounded-3xl p-8 text-center">
+                <div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center mx-auto mb-3">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">inbox</span>
+                </div>
+                <p class="text-sm font-bold text-on-surface-variant">Belum ada area tugas yang ditugaskan.</p>
+            </div>
             @endforelse
 
         </div>
