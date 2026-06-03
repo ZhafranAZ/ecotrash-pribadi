@@ -63,6 +63,7 @@ class LaporanLiarController extends Controller
                 'status' => $l->status,
                 'petugas' => $l->petugas->nama ?? null,
                 'alasanPenolakan' => $l->alasan_penolakan,
+                'alasanDitunda' => $l->alasan_ditunda,
                 'koinReward' => $l->koin_reward,
             ];
         });

@@ -165,12 +165,32 @@
                                                 </div>
                                             </div>
                                         </template>
+                                        <template x-if="selectedLaporan.status === 'ditunda'">
+                                            <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-amber-600">pause_circle</span>
+                                                <div>
+                                                    <p class="text-amber-800 font-bold">Ditunda (Ada Kendala)</p>
+                                                    <p class="text-[10px] text-amber-600" x-show="selectedLaporan.alasanDitunda" x-text="'Alasan: ' + selectedLaporan.alasanDitunda"></p>
+                                                    <p class="text-[10px] text-amber-600" x-show="selectedLaporan.petugas" x-text="'Petugas: ' + selectedLaporan.petugas"></p>
+                                                </div>
+                                            </div>
+                                        </template>
                                         <template x-if="selectedLaporan.status === 'ditolak'">
                                             <div class="bg-red-50 border border-red-200 p-3 rounded-lg flex items-center gap-2">
                                                 <span class="material-symbols-outlined text-red-500">cancel</span>
                                                 <div>
                                                     <p class="text-red-700 font-bold">Ditolak</p>
                                                     <p class="text-[10px] text-red-600" x-show="selectedLaporan.alasanPenolakan" x-text="'Alasan: ' + selectedLaporan.alasanPenolakan"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template x-if="selectedLaporan.status === 'selesai'">
+                                            <div class="bg-green-50 border border-green-200 p-3 rounded-lg flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-green-600">check_circle</span>
+                                                <div>
+                                                    <p class="text-green-800 font-bold">Selesai Dibersihkan</p>
+                                                    <p class="text-[10px] text-green-600" x-show="selectedLaporan.petugas" x-text="'Petugas: ' + selectedLaporan.petugas"></p>
+                                                    <p class="text-[10px] text-green-600" x-show="selectedLaporan.koinReward" x-text="'Reward Koin: +' + selectedLaporan.koinReward"></p>
                                                 </div>
                                             </div>
                                         </template>
