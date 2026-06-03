@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <p class="text-sm font-bold text-on-surface-variant">Halo Petugas,</p>
-                <h1 class="text-2xl font-black text-on-surface">Ahmad Sobari</h1>
+                <h1 class="text-2xl font-black text-on-surface">{{ $user->nama }}</h1>
             </div>
             <div class="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center border-2 border-white shadow-sm shrink-0">
                 <span class="material-symbols-outlined text-[24px]">account_circle</span>
@@ -30,46 +30,35 @@
             
             <div class="flex items-center justify-between mb-4 px-1">
                 <h2 class="text-lg font-black text-on-surface">Area Tugas Hari Ini</h2>
-                <span class="text-xs font-bold bg-primary text-white px-3 py-1 rounded-full shadow-sm">2 Komplek</span>
+                <span class="text-xs font-bold bg-primary text-white px-3 py-1 rounded-full shadow-sm">{{ $kompleks->count() }} Komplek</span>
             </div>
 
-            <!-- Komplek Card 1 -->
-            <a href="{{ route('petugas.komplek.warga', ['id' => 1]) }}" class="block glass-card rounded-3xl p-5 hover:scale-[0.99] transition-transform">
+            @forelse($kompleks as $komplek)
+            <a href="{{ route('petugas.komplek.warga', ['id' => $komplek->id]) }}" class="block glass-card rounded-3xl p-5 hover:scale-[0.99] transition-transform">
                 <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                        <span class="material-symbols-outlined text-[28px]">holiday_village</span>
+                    <div class="w-14 h-14 rounded-2xl {{ $komplek->pesanan_count > 0 ? 'bg-primary/20 text-primary' : 'bg-surface-variant text-on-surface-variant' }} flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[28px]">{{ $loop->odd ? 'holiday_village' : 'domain' }}</span>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="text-base font-bold text-on-surface mb-0.5 truncate">Perumahan Asri Indah</h3>
-                        <p class="text-xs font-medium text-on-surface-variant">Kec. Bojongsoang</p>
+                        <h3 class="text-base font-bold text-on-surface mb-0.5 truncate">{{ $komplek->nama_komplek }}</h3>
+                        <p class="text-xs font-medium text-on-surface-variant">Tugas hari ini</p>
                     </div>
                     <div class="text-right shrink-0">
-                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-xs font-black shadow-sm mb-1">
-                            8
+                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $komplek->pesanan_count > 0 ? 'bg-primary text-white' : 'bg-surface text-on-surface border border-outline' }} text-xs font-black shadow-sm mb-1">
+                            {{ $komplek->pesanan_count }}
                         </div>
                         <p class="text-[10px] font-bold text-on-surface-variant">Titik</p>
                     </div>
                 </div>
             </a>
-
-            <!-- Komplek Card 2 -->
-            <a href="{{ route('petugas.komplek.warga', ['id' => 2]) }}" class="block glass-card rounded-3xl p-5 hover:scale-[0.99] transition-transform">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-surface-variant flex items-center justify-center text-on-surface-variant shrink-0">
-                        <span class="material-symbols-outlined text-[28px]">domain</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-base font-bold text-on-surface mb-0.5 truncate">Komp. Permata Hijau</h3>
-                        <p class="text-xs font-medium text-on-surface-variant">Kec. Bojongsoang</p>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface text-on-surface text-xs font-black border border-outline shadow-sm mb-1">
-                            0
-                        </div>
-                        <p class="text-[10px] font-bold text-on-surface-variant">Titik</p>
-                    </div>
+            @empty
+            <div class="glass-card rounded-3xl p-8 text-center">
+                <div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center mx-auto mb-3">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">inbox</span>
                 </div>
-            </a>
+                <p class="text-sm font-bold text-on-surface-variant">Belum ada area tugas yang ditugaskan.</p>
+            </div>
+            @endforelse
 
         </div>
 

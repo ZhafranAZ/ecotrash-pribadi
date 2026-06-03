@@ -23,6 +23,13 @@ class RiwayatStatusPesanan extends Model
         'keterangan',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+        ];
+    }
+
     public function pesanan(): BelongsTo
     {
         return $this->belongsTo(PesananPengangkutan::class, 'pesanan_id');

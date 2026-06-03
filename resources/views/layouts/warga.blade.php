@@ -119,8 +119,9 @@
                         <button @click="showNotif = !showNotif"
                             class="relative p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">
                             <span class="material-symbols-outlined text-[24px]">notifications</span>
-                            <span
-                                class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                            @if($unreadCount > 0)
+                                <span class="absolute -top-1 -right-1 min-w-[20px] h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white px-1">{{ $unreadCount }}</span>
+                            @endif
                         </button>
 
                         <!-- Notification Dropdown -->
@@ -129,46 +130,39 @@
                             style="display:none;">
                             <div class="p-4 border-b border-outline flex justify-between items-center bg-surface">
                                 <h3 class="font-bold text-on-surface">Notifikasi</h3>
-                                <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">2
+                                <span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">{{ $unreadCount }}
                                     Baru</span>
                             </div>
                             <div class="max-h-80 overflow-y-auto">
-                                <div
-                                    class="p-4 border-b border-outline hover:bg-surface transition-colors cursor-pointer opacity-100">
-                                    <p class="font-bold text-sm text-on-surface">Pesanan Selesai!</p>
-                                    <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Pesanan #ORD-001 telah
-                                        selesai. Koin sebesar 150 telah ditambahkan ke saldo Anda.</p>
-                                    <p class="text-[10px] text-on-surface-variant mt-2 font-medium">Baru saja</p>
-                                </div>
-                                <div
-                                    class="p-4 border-b border-outline hover:bg-surface transition-colors cursor-pointer opacity-100">
-                                    <p class="font-bold text-sm text-on-surface">Laporan Diterima</p>
-                                    <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Laporan sampah liar di
-                                        Lahan Kosong Blok C sedang diproses oleh admin.</p>
-                                    <p class="text-[10px] text-on-surface-variant mt-2 font-medium">2 jam yang lalu</p>
-                                </div>
-                                <div class="p-4 hover:bg-surface transition-colors cursor-pointer opacity-60">
-                                    <p class="font-bold text-sm text-on-surface">Selamat Datang di EcoTrash</p>
-                                    <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Lengkapi profil Anda
-                                        dan mulai bantu ciptakan lingkungan yang lebih bersih.</p>
-                                    <p class="text-[10px] text-on-surface-variant mt-2 font-medium">1 hari yang lalu</p>
-                                </div>
+                                @forelse($unreadNotifications as $notif)
+                                    <div class="p-4 border-b border-outline hover:bg-surface transition-colors cursor-pointer {{ $notif->is_read ? 'opacity-60' : 'opacity-100' }}">
+                                        <p class="font-bold text-sm text-on-surface">{{ $notif->judul }}</p>
+                                        <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">{{ $notif->pesan }}</p>
+                                        <p class="text-[10px] text-on-surface-variant mt-2 font-medium">{{ $notif->created_at->diffForHumans() }}</p>
+                                    </div>
+                                @empty
+                                    <div class="p-6 text-center">
+                                        <p class="text-sm text-on-surface-variant">Belum ada notifikasi.</p>
+                                    </div>
+                                @endforelse
                             </div>
                             <div class="p-3 border-t border-outline text-center bg-surface">
-                                <a href="#" class="text-sm font-bold text-primary hover:underline">Tandai semua
-                                    dibaca</a>
+                                <form method="POST" action="{{ route('notifikasi.markAllRead') }}">
+                                    @csrf
+                                    <button type="submit" class="text-sm font-bold text-primary hover:underline">Tandai semua dibaca</button>
+                                </form>
                             </div>
                         </div>
                     </div>
                     <div class="h-8 w-px bg-outline mx-1"></div>
                     <div class="flex items-center gap-3">
                         <div class="text-right">
-                            <p class="text-xs font-bold text-on-surface">Budi Santoso</p>
+                            <p class="text-xs font-bold text-on-surface">{{ Auth::user()->nama ?? 'Pengguna' }}</p>
                             <p class="text-[10px] text-on-surface-variant">Warga</p>
                         </div>
                         <div
                             class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                            B
+                            {{ substr(Auth::user()->nama ?? 'U', 0, 1) }}
                         </div>
                     </div>
                 </div>
