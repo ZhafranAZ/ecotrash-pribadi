@@ -20,7 +20,7 @@
     {{ session('error') }}
 </div>
 @endif
-<div class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden" x-data="{ activeTab: 'harga', showKomplekModal: false, showDeleteKomplekModal: false, isEditMode: false, selectedKomplek: { id: null, nama_komplek: '', lat: '', lng: '' }, deleteKomplekId: null }">
+<div class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden" x-data="{ activeTab: '{{ session('active_tab', 'harga') }}', showKomplekModal: false, showDeleteKomplekModal: false, isEditMode: false, selectedKomplek: { id: null, nama_komplek: '', lat: '', lng: '' }, deleteKomplekId: null }">
     
     <!-- Tabs Header -->
     <div class="flex overflow-x-auto border-b border-outline-variant bg-surface-dim px-4">
@@ -39,7 +39,8 @@
     <div x-show="activeTab === 'harga'" class="p-6 sm:p-8" style="display: none;">
         <h3 class="text-lg font-bold text-on-surface mb-6">Konfigurasi Nilai Tukar & Harga Dasar</h3>
         
-        <form class="max-w-2xl flex flex-col gap-6">
+        <form method="POST" action="{{ route('admin.pengaturan.harga.update') }}" class="max-w-2xl flex flex-col gap-6">
+            @csrf
             <div class="bg-surface-dim p-4 rounded-lg border border-outline-variant">
                 <label class="block font-medium text-sm text-on-surface mb-2">Nilai Tukar Koin Reward</label>
                 <div class="flex items-center gap-3">
@@ -47,7 +48,7 @@
                     <span class="text-on-surface-variant font-bold">=</span>
                     <div class="relative w-full sm:w-48">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
-                        <input type="number" value="100" class="pl-10 pr-4 py-2 border border-outline-variant rounded-lg w-full text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        <input type="number" name="konversi_koin_rupiah" value="{{ $pengaturan->konversi_koin_rupiah ?? 100 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-lg w-full text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                     </div>
                 </div>
                 <p class="text-xs text-on-surface-variant mt-2">Digunakan untuk menghitung diskon warga saat melakukan pemesanan.</p>
@@ -61,7 +62,7 @@
                         <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Kecil</p>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
-                            <input type="number" value="10000" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <input type="number" name="harga_kategori_kecil" value="{{ $pengaturan->harga_kategori_kecil ?? 10000 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                         </div>
                     </div>
                     <!-- Sedang -->
@@ -69,7 +70,7 @@
                         <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Sedang</p>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
-                            <input type="number" value="20000" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <input type="number" name="harga_kategori_sedang" value="{{ $pengaturan->harga_kategori_sedang ?? 20000 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                         </div>
                     </div>
                     <!-- Besar -->
@@ -77,7 +78,7 @@
                         <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Besar</p>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">Rp</span>
-                            <input type="number" value="35000" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <input type="number" name="harga_kategori_besar" value="{{ $pengaturan->harga_kategori_besar ?? 35000 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                         </div>
                     </div>
                 </div>
@@ -92,7 +93,7 @@
                         <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Kecil</p>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-medium material-symbols-outlined text-[18px]">generating_tokens</span>
-                            <input type="number" value="10" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <input type="number" name="bonus_koin_kecil" value="{{ $pengaturan->bonus_koin_kecil ?? 10 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                         </div>
                     </div>
                     <!-- Sedang -->
@@ -100,7 +101,7 @@
                         <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Sedang</p>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-medium material-symbols-outlined text-[18px]">generating_tokens</span>
-                            <input type="number" value="20" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <input type="number" name="bonus_koin_sedang" value="{{ $pengaturan->bonus_koin_sedang ?? 20 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                         </div>
                     </div>
                     <!-- Besar -->
@@ -108,14 +109,14 @@
                         <p class="text-sm font-semibold text-on-surface mb-2">Ukuran Besar</p>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-medium material-symbols-outlined text-[18px]">generating_tokens</span>
-                            <input type="number" value="35" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                            <input type="number" name="bonus_koin_besar" value="{{ $pengaturan->bonus_koin_besar ?? 35 }}" class="pl-10 pr-4 py-2 border border-outline-variant rounded-md w-full text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="0">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="pt-4 border-t border-outline-variant">
-                <button type="button" class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg font-bold transition-colors">Simpan Perubahan Harga</button>
+                <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg font-bold transition-colors">Simpan Perubahan Harga</button>
             </div>
         </form>
     </div>
@@ -124,38 +125,20 @@
     <div x-show="activeTab === 'jadwal'" class="p-6 sm:p-8" style="display: none;">
         <h3 class="text-lg font-bold text-on-surface mb-6">Ketersediaan & Batas Pemesanan</h3>
         
-        <form class="max-w-2xl flex flex-col gap-6">
+        <form method="POST" action="{{ route('admin.pengaturan.jadwal.update') }}" class="max-w-2xl flex flex-col gap-6">
+            @csrf
             <div>
                 <label class="block font-medium text-sm text-on-surface mb-3">Hari Operasional (Hari Kerja TPS)</label>
                 <div class="flex flex-wrap gap-3">
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors">
-                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Senin</span>
+                    @php
+                        $hariOperasional = $pengaturan->hari_operasional ?? ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+                    @endphp
+                    @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $hari)
+                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors {{ in_array($hari, $hariOperasional) ? '' : 'opacity-60' }}">
+                        <input type="checkbox" name="hari_operasional[]" value="{{ $hari }}" {{ in_array($hari, $hariOperasional) ? 'checked' : '' }} class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
+                        <span class="text-sm font-medium">{{ $hari }}</span>
                     </label>
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors">
-                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Selasa</span>
-                    </label>
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors opacity-60">
-                        <input type="checkbox" class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Rabu</span>
-                    </label>
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors">
-                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Kamis</span>
-                    </label>
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors">
-                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Jumat</span>
-                    </label>
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors">
-                        <input type="checkbox" checked class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Sabtu</span>
-                    </label>
-                    <label class="flex items-center gap-2 bg-surface-variant px-4 py-2 rounded-lg cursor-pointer hover:bg-outline-variant transition-colors opacity-60">
-                        <input type="checkbox" class="rounded text-primary focus:ring-primary h-4 w-4 border-outline-variant">
-                        <span class="text-sm font-medium">Minggu</span>
-                    </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -163,21 +146,21 @@
                 <div>
                     <label class="block font-medium text-sm text-on-surface mb-2">Batas Waktu Pemesanan (Cut-off Time)</label>
                     <div class="flex items-center gap-2">
-                        <input type="time" value="20:00" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        <input type="time" name="batas_waktu_pesan" value="{{ $pengaturan->batas_waktu_pesan ?? '17:00' }}" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none" required>
                         <span class="text-sm text-on-surface-variant">WIB (H-1)</span>
                     </div>
                 </div>
                 <div>
                     <label class="block font-medium text-sm text-on-surface mb-2">Kuota Pesanan Maksimal Harian</label>
                     <div class="flex items-center gap-2">
-                        <input type="number" value="100" class="px-4 py-2 border border-outline-variant rounded-lg w-24 text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                        <input type="number" name="kuota_pesanan_harian" value="{{ $pengaturan->kuota_pesanan_harian ?? 50 }}" class="px-4 py-2 border border-outline-variant rounded-lg w-24 text-on-surface bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none" required min="1">
                         <span class="text-sm text-on-surface-variant">Pesanan / Hari</span>
                     </div>
                 </div>
             </div>
 
             <div class="pt-4 border-t border-outline-variant">
-                <button type="button" class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg font-bold transition-colors">Simpan Jadwal & Kuota</button>
+                <button type="submit" class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg font-bold transition-colors">Simpan Jadwal & Kuota</button>
             </div>
         </form>
     </div>

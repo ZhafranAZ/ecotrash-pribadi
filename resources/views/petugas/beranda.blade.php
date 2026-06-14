@@ -6,9 +6,13 @@
                 <p class="text-sm font-bold text-on-surface-variant">Halo Petugas,</p>
                 <h1 class="text-2xl font-black text-on-surface">{{ $petugas->nama }}</h1>
             </div>
-            <div class="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center border-2 border-white shadow-sm shrink-0">
-                <span class="material-symbols-outlined text-[24px]">account_circle</span>
-            </div>
+            <a href="{{ route('petugas.profil') }}" class="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center border-2 border-white shadow-sm shrink-0 overflow-hidden">
+                @if($petugas->foto_profil)
+                    <img src="{{ asset('storage/' . $petugas->foto_profil) }}" class="w-full h-full object-cover">
+                @else
+                    <span class="material-symbols-outlined text-[24px]">account_circle</span>
+                @endif
+            </a>
         </div>
 
         <!-- Segmented Control -->

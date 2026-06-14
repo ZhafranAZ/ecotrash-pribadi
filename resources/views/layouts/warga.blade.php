@@ -161,8 +161,12 @@
                             <p class="text-[10px] text-on-surface-variant">Warga</p>
                         </div>
                         <div
-                            class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                            {{ substr(Auth::user()->nama ?? 'U', 0, 1) }}
+                            class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden">
+                            @if(Auth::user()->foto_profil)
+                                <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" alt="Avatar" class="w-full h-full object-cover">
+                            @else
+                                {{ substr(Auth::user()->nama ?? 'U', 0, 1) }}
+                            @endif
                         </div>
                     </div>
                 </div>

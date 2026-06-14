@@ -11,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class ProfilController extends Controller
@@ -151,5 +153,33 @@ class ProfilController extends Controller
         }
 
         return redirect()->back()->with('success', 'Alamat berhasil dihapus.');
+    }
+
+    /**
+     * Upload/change warga profile picture.
+     */
+    public function uploadFoto(Request $request): JsonResponse
+    {
+        $request->validate([
+            'foto' => ['required', 'image', 'max:2048']
+        ]);
+
+        $user = Auth::user();
+
+        // Hapus foto lama jika ada
+        if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+            Storage::disk('public')->delete($user->foto_profil);
+        }
+
+        // Simpan foto baru
+        $path = $request->file('foto')->store('foto_profil', 'public');
+        
+        $user->update([
+            'foto_profil' => $path
+        ]);
+
+        return response()->json([
+            'url' => asset('storage/' . $path)
+        ]);
     }
 }

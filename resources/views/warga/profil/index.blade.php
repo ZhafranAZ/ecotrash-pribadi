@@ -46,12 +46,27 @@
     deleteAddressId: null,
     primaryId: {{ $primaryAddressId ?? 'null' }},
     editingAddress: { id: null, title: '', komplek_id: '', blok_nomor_rumah: '', detail_patokan: '' },
-    profileImage: null,
+    profileImage: '{{ $user->foto_profil ? asset('storage/' . $user->foto_profil) : '' }}',
     handleImageUpload(e) {
         const file = e.target.files[0];
-        if (file) {
-            this.profileImage = URL.createObjectURL(file);
-        }
+        if (!file) return;
+        this.profileImage = URL.createObjectURL(file);
+        
+        const formData = new FormData();
+        formData.append('foto', file);
+        
+        axios.post('{{ route('warga.profil.uploadFoto') }}', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+            }
+        })
+        .then(res => {
+            window.location.reload();
+        })
+        .catch(err => {
+            alert(err.response?.data?.message || 'Gagal mengunggah foto profil.');
+        });
     },
     addresses: {{ json_encode($addressesJson) }},
     startEdit(addr) {

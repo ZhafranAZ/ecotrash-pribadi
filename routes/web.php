@@ -16,6 +16,9 @@ use App\Http\Controllers\Warga\LaporanController;
 use App\Http\Controllers\Admin\LaporanLiarController;
 use App\Http\Controllers\Admin\OperasionalController;
 use App\Http\Controllers\Petugas\TugasController;
+use App\Http\Controllers\Admin\PengaturanController as AdminPengaturanController;
+use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
+use App\Http\Controllers\Admin\NotifikasiController as AdminNotifikasiController;
 
 // Landing page
 Route::get('/', function () {
@@ -56,6 +59,7 @@ Route::prefix('warga')->name('warga.')->middleware(['auth', 'role:warga', 'addre
     // Profil & Alamat (MODUL 2)
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
     Route::put('/profil/update', [ProfilController::class, 'updateProfile'])->name('profil.update');
+    Route::post('/profil/upload-foto', [ProfilController::class, 'uploadFoto'])->name('profil.uploadFoto');
     Route::post('/profil/alamat', [ProfilController::class, 'storeAlamat'])->name('profil.alamat.store');
     Route::put('/profil/alamat/{id}', [ProfilController::class, 'updateAlamat'])->name('profil.alamat.update');
     Route::put('/profil/alamat/{id}/utama', [ProfilController::class, 'setAlamatUtama'])->name('profil.alamat.utama');
@@ -105,14 +109,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/pengaturan/komplek', [KomplekController::class, 'store'])->name('pengaturan.komplek.store');
     Route::put('/pengaturan/komplek/{id}', [KomplekController::class, 'update'])->name('pengaturan.komplek.update');
     Route::delete('/pengaturan/komplek/{id}', [KomplekController::class, 'destroy'])->name('pengaturan.komplek.destroy');
+    Route::post('/pengaturan/harga', [AdminPengaturanController::class, 'updateHarga'])->name('pengaturan.harga.update');
+    Route::post('/pengaturan/jadwal', [AdminPengaturanController::class, 'updateJadwal'])->name('pengaturan.jadwal.update');
 
-    Route::get('/profil', function () {
-        return view('admin.profil.index');
-    })->name('profil.index');
+    Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil.index');
+    Route::post('/profil/update', [AdminProfilController::class, 'updateProfil'])->name('profil.update');
+    Route::post('/profil/password', [AdminProfilController::class, 'changePassword'])->name('profil.password');
 
-    Route::get('/notifikasi', function () {
-        return view('admin.notifikasi.index');
-    })->name('notifikasi.index');
+    Route::get('/notifikasi', [AdminNotifikasiController::class, 'index'])->name('notifikasi.index');
 });
 
 // --- Petugas Routes ---
@@ -135,7 +139,8 @@ Route::prefix('petugas')->name('petugas.')->middleware(['auth', 'role:petugas'])
     Route::get('/riwayat', [TugasController::class, 'riwayat'])->name('riwayat');
     Route::get('/riwayat/{type}/{id}', [TugasController::class, 'riwayatDetail'])->name('riwayat.detail');
 
-    Route::get('/profil', function () {
-        return view('petugas.profil');
-    })->name('profil');
+    Route::get('/profil', [\App\Http\Controllers\Petugas\ProfilController::class, 'index'])->name('profil');
+    Route::post('/profil/upload-foto', [\App\Http\Controllers\Petugas\ProfilController::class, 'uploadFoto'])->name('profil.uploadFoto');
+    Route::post('/profil/berhalangan', [\App\Http\Controllers\Petugas\ProfilController::class, 'berhalangan'])->name('profil.berhalangan');
+    Route::post('/profil/aktif', [\App\Http\Controllers\Petugas\ProfilController::class, 'aktif'])->name('profil.aktif');
 });

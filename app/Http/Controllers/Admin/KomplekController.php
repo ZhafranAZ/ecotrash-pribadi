@@ -9,6 +9,8 @@ use App\Models\Komplek;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+use App\Models\PengaturanSistem;
+
 class KomplekController extends Controller
 {
     /**
@@ -17,8 +19,9 @@ class KomplekController extends Controller
     public function index(): View
     {
         $kompleks = Komplek::orderBy('created_at', 'desc')->get();
+        $pengaturan = PengaturanSistem::first();
 
-        return view('admin.pengaturan.index', compact('kompleks'));
+        return view('admin.pengaturan.index', compact('kompleks', 'pengaturan'));
     }
 
     /**
@@ -28,7 +31,9 @@ class KomplekController extends Controller
     {
         Komplek::create($request->validated());
 
-        return redirect()->back()->with('success', 'Komplek baru berhasil ditambahkan.');
+        return redirect()->back()
+            ->with('success', 'Komplek baru berhasil ditambahkan.')
+            ->with('active_tab', 'komplek');
     }
 
     /**
@@ -39,7 +44,9 @@ class KomplekController extends Controller
         $komplek = Komplek::findOrFail($id);
         $komplek->update($request->validated());
 
-        return redirect()->back()->with('success', 'Data komplek berhasil diperbarui.');
+        return redirect()->back()
+            ->with('success', 'Data komplek berhasil diperbarui.')
+            ->with('active_tab', 'komplek');
     }
 
     /**
@@ -54,14 +61,20 @@ class KomplekController extends Controller
         $isUsed = AlamatWarga::where('komplek_id', $id)->exists();
 
         if ($isUsed) {
-            return redirect()->back()->with('error', 'Komplek tidak dapat dihapus karena masih digunakan oleh Warga.');
+            return redirect()->back()
+                ->with('error', 'Komplek tidak dapat dihapus karena masih digunakan oleh Warga.')
+                ->with('active_tab', 'komplek');
         }
 
         try {
             $komplek->delete();
-            return redirect()->back()->with('success', 'Komplek berhasil dihapus.');
+            return redirect()->back()
+                ->with('success', 'Komplek berhasil dihapus.')
+                ->with('active_tab', 'komplek');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus komplek.');
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menghapus komplek.')
+                ->with('active_tab', 'komplek');
         }
     }
 }

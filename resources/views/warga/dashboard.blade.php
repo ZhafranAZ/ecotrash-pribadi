@@ -41,8 +41,12 @@
 
 @section('header')
     <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm">
-            {{ substr($namaUser, 0, 1) }}
+        <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm overflow-hidden">
+            @if(auth()->user()->foto_profil)
+                <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" alt="Avatar" class="w-full h-full object-cover">
+            @else
+                {{ substr($namaUser, 0, 1) }}
+            @endif
         </div>
         <div class="flex flex-col">
             <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">Selamat datang,</span>

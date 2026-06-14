@@ -246,25 +246,34 @@ class TugasController extends Controller
             }
 
             if ($tipeKendala === 'beda_ukuran') {
+                $pengaturan = PengaturanSistem::first();
+                $ukuranAktual = strtolower($request->input('ukuran_aktual'));
+                $ukuranAwal = strtolower($pesanan->kategori_sampah);
+
+                $hargaAktual = $pengaturan->{'harga_kategori_' . $ukuranAktual} ?? 0;
+                $hargaAwal = $pengaturan->{'harga_kategori_' . $ukuranAwal} ?? 0;
+                $selisihHarga = max(0, $hargaAktual - $hargaAwal);
+
                 $pesanan->update([
                     'status'                        => 'hold_kapasitas',
                     'ukuran_aktual_laporan_petugas' => $request->input('ukuran_aktual'),
                     'foto_kendala'                  => $uploadedFilePath,
                     'alasan_kendala'                => $request->input('alasan', 'Ukuran sampah tidak sesuai pesanan'),
+                    'selisih_harga'                 => $selisihHarga,
                 ]);
 
                 // Catat riwayat status
                 RiwayatStatusPesanan::create([
                     'pesanan_id' => $pesanan->id,
                     'status'     => 'hold_kapasitas',
-                    'keterangan' => 'Hold kapasitas: Ukuran aktual ' . $request->input('ukuran_aktual') . '.',
+                    'keterangan' => 'Hold kapasitas: Ukuran aktual ' . $request->input('ukuran_aktual') . '. Selisih harga: Rp' . number_format($selisihHarga, 0, ',', '.') . '.',
                 ]);
 
                 // Notifikasi ke warga (tipe warning untuk trigger banner)
                 NotificationService::send(
                     $pesanan->warga_id,
                     'Pembayaran Tambahan Diperlukan',
-                    'Ukuran sampah Anda ternyata lebih besar dari yang dipesan. Diperlukan pembayaran tambahan.',
+                    'Ukuran sampah Anda ternyata lebih besar dari yang dipesan. Diperlukan pembayaran tambahan sebesar Rp' . number_format($selisihHarga, 0, ',', '.') . '.',
                     'warning'
                 );
             }
